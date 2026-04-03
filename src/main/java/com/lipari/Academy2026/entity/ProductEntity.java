@@ -1,15 +1,32 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
+import java.util.UUID;
 
 @Entity
-@Data
+@Table(name = "product")
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
 public class ProductEntity {
 
     @Id
+    @EqualsAndHashCode.Include // Genera Equals e HashCode basandosi su questo campo
     @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    private UUID id;
 
-    String name;
+    private String name;
+
+    // Molti prodotti possono avere la stessa categoria (serve a JPA)
+    @ManyToOne()
+    @JoinColumn(name = "category_id")
+    @ToString.Exclude // Evita loop infiniti con il toString della categoria
+    private CategoryEntity category;
 }
