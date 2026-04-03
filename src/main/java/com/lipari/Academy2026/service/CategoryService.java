@@ -1,20 +1,19 @@
 package com.lipari.Academy2026.service;
 
-import com.lipari.Academy2026.dto.ProductDTO;
-import com.lipari.Academy2026.entity.ProductEntity;
-import org.springframework.http.ResponseEntity;
+import com.lipari.Academy2026.dto.CategoryDTO;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface ProductService {
+public interface CategoryService {
 
-    public ProductDTO newProduct(ProductDTO productDTO);
+    public CategoryDTO createCategory(CategoryDTO CategoryDTO);
 
-    public ProductDTO getProduct(String id) throws Exception;
+    public CategoryDTO getCategory(UUID id) throws Exception;
 
-    public void deleteProduct(String id) throws Exception;
+    public void deleteCategory(UUID id) throws Exception;
 
-    public ProductDTO modifyProduct(ProductDTO productDTO) throws Exception;
+    public CategoryDTO updateCategory(CategoryDTO CategoryDTO) throws Exception;
 
-    public List<ProductDTO> getAllProducts();
+    public List<CategoryDTO> getAllCategories();
 }
