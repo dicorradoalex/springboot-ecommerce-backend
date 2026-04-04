@@ -4,6 +4,7 @@ import com.lipari.Academy2026.dto.CategoryDTO;
 import com.lipari.Academy2026.dto.ProductDTO;
 import com.lipari.Academy2026.entity.CategoryEntity;
 import com.lipari.Academy2026.entity.ProductEntity;
+import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.CategoryMapper;
 import com.lipari.Academy2026.mapper.ProductMapper;
 import com.lipari.Academy2026.repository.CategoryRepository;
@@ -41,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO getCategory(UUID id) throws Exception {
+    public CategoryDTO getCategory(UUID id) {
         // Chiedo al repository di trovare l'entità
         Optional<CategoryEntity> categoryOptional = this.categoryRepository.findById(id);
         // Se presente
@@ -49,14 +50,14 @@ public class CategoryServiceImpl implements CategoryService {
             // Entity -> DTO e restituisco al Controller
             return this.categoryMapper.toDto(categoryOptional.get());
         } else {
-            // Se qualcosa non va lancia eccezione
-            throw new Exception("Categoria non trovata");
+            // Se qualcosa non va lancia eccezione personalizzata
+            throw new ResourceNotFoundException("Categoria con ID " + id + " non trovata.");
         }
 
     }
 
     @Override
-    public void deleteCategory(UUID id) throws Exception {
+    public void deleteCategory(UUID id) {
         // Chiedi al Repository di recuperare il prodotto
         Optional<CategoryEntity> categoryOptional = this.categoryRepository.findById(id);
         // Se lo trovo
@@ -65,13 +66,13 @@ public class CategoryServiceImpl implements CategoryService {
             this.categoryRepository.delete(categoryOptional.get());
         } else {
             // Se qualcosa non va lancia eccezione
-            throw new Exception("Categoria non trovata.");
+            throw new ResourceNotFoundException("Categoria con ID " + id + " non trovata.");
         }
     }
 
 
     @Override
-    public CategoryDTO updateCategory(CategoryDTO categoryDTO) throws Exception {
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
         // Chiedi al repository di cercare il DTO nel db
         Optional<CategoryEntity> categoryOptional = this.categoryRepository.findById(categoryDTO.id());
         // Se presente
@@ -86,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
             return this.categoryMapper.toDto(savedProduct);
         }
         else {
-            throw new Exception("Categoria non trovata");
+            throw new ResourceNotFoundException("Categoria con ID " + categoryDTO.id() + " non trovata.");
         }
     }
 
