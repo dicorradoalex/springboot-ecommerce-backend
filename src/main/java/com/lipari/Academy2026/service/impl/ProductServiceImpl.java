@@ -4,6 +4,7 @@ import com.lipari.Academy2026.dto.ProductDTO;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.ProductMapper;
+import com.lipari.Academy2026.repository.CategoryRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
 import com.lipari.Academy2026.service.ProductService;
 import org.springframework.stereotype.Service;
@@ -19,21 +20,32 @@ public class ProductServiceImpl implements ProductService {
     // Componenti utilizzati dal Service -> final per constructor injection
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
 
     // Constructor Injection
-    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ProductMapper productMapper,
+                              CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
         // DTO -> Entity
         ProductEntity product = this.productMapper.toEntity(productDTO);
-        // Salvo la nuova entity nel db
-        product = this.productRepository.save(product);
-        // Restituisco ciò che ho salvato
-        return this.productMapper.toDto(product);
+        // Estraggo l'ID della categoria dal DTO
+        UUID id_category = productDTO.category().id();
+        if(this.categoryRepository.findById(id_category).isPresent()) {
+            // Salvo la nuova entity nel db
+            product = this.productRepository.save(product);
+            // Restituisco ciò che ho salvato
+            return this.productMapper.toDto(product);
+        }
+        else {
+            throw new ResourceNotFoundException("La categoria con ID " + id_category + " non è stata trovata.");
+        }
     }
 
     @Override
