@@ -4,8 +4,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/changelog/changes/01-create-initial-schema.xml" relativeToChangelogFile="false"/>
-    <include file="db/changelog/changes/02-add-price-and-description-to-product.xml" relativeToChangelogFile="false"/>
-    <include file="db/changelog/changes/03-set-category-id-not-nullable.xml" relativeToChangelogFile="false"/>
+    <changeSet id="03" author="admin">
 
+        <addNotNullConstraint
+                tableName="product"
+                columnName="category_id"
+                columnDataType="UUID"/>
+    </changeSet>
 </databaseChangeLog>
