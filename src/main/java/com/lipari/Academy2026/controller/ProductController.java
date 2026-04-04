@@ -21,45 +21,28 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProduct(@PathVariable String id) {
-        try {
-            // Chiamo il service per ottenere il risultato
-            ProductDTO product = this.productService.getProduct(id);
-            // Se tutto ok, restituisci lo stato 200 e il dato nel corpo del body
-            return ResponseEntity.ok(product);
-        } catch (Exception e) {
-            // Se c'è un errore restituisci 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            // .body chiude la risposta con un messaggio (di errore) nel corpo
-            // .build chiude la risposta senza un corpo dati
-            // se usi .body => restituisci una stringa => il metodo deve ritornare "?"
-        }
+
+        // Chiamo il service per ottenere il risultato
+        ProductDTO product = this.productService.getProduct(id);
+        // Se tutto ok, restituisci lo stato 200 e il dato nel corpo del body
+        return ResponseEntity.ok(product);
     }
 
     @PostMapping("/new")
     public ResponseEntity<ProductDTO> newProduct(@RequestBody ProductDTO productDTO) {
-        try {
-            // Chiedo al Service di creare un nuovo prodotto
-            ProductDTO createdProduct = this.productService.createProduct(productDTO);
-            // Se tutto ok restituisco 201 + prodotto creato
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
-        } catch (Exception e) {
-            // Se qualcosa non va restituisco 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        // Chiedo al Service di creare un nuovo prodotto
+        ProductDTO createdProduct = this.productService.newProduct(productDTO);
+        // Se tutto ok restituisco 201 + prodotto creato
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
     // Delete con 204 no content
     @DeleteMapping("/{id}")
     public ResponseEntity<ProductDTO> deleteProduct(@PathVariable String id) {
-        try {
             // Chiedi al service di eliminare il prodotto
             this.productService.deleteProduct(id);
             // Restituisci 204, no content
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            // Se qualcosa non va restituisci 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
     }
 
     /*
@@ -82,15 +65,10 @@ public class ProductController {
 
     @PutMapping("/update")
     public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO) {
-        try {
-            // Chiedo al Service di modificare il prodotto
-            ProductDTO modifiedProduct = this.productService.createProduct(productDTO);
-            // Se è tutto ok -> 200 (restituiendo il prodotto aggiornato)
-            return ResponseEntity.ok(modifiedProduct);
-        } catch (Exception e) {
-            // Se qualcosa non va -> 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        // Chiedo al Service di modificare il prodotto
+        ProductDTO modifiedProduct = this.productService.modifyProduct(productDTO);
+        // Se è tutto ok -> 200 (restituiendo il prodotto aggiornato)
+        return ResponseEntity.ok(modifiedProduct);
     }
 
     @GetMapping("/all")

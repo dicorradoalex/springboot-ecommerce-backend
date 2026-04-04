@@ -10,11 +10,11 @@ public interface ProductService {
 
     public ProductDTO createProduct(ProductDTO productDTO);
 
-    public ProductDTO getProduct(String id) throws Exception;
+    public ProductDTO getProduct(String id);
 
-    public void deleteProduct(String id) throws Exception;
+    public void deleteProduct(String id);
 
-    public ProductDTO updateProduct(ProductDTO productDTO) throws Exception;
+    public ProductDTO modifyProduct(ProductDTO productDTO);
 
     public List<ProductDTO> getAllProducts();
 }

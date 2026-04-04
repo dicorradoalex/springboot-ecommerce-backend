@@ -1,6 +1,8 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
+
+import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
@@ -21,4 +23,8 @@ public class CategoryEntity {
     private UUID id;
 
     private String name;
+
+    @OneToMany(mappedBy = "category")
+    @ToString.Exclude
+    private List<ProductEntity> productsList;
 }

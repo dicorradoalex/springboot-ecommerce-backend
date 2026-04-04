@@ -2,6 +2,7 @@ package com.lipari.Academy2026.service.impl;
 
 import com.lipari.Academy2026.dto.ProductDTO;
 import com.lipari.Academy2026.entity.ProductEntity;
+import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.ProductMapper;
 import com.lipari.Academy2026.repository.ProductRepository;
 import com.lipari.Academy2026.service.ProductService;
@@ -35,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getProduct(String id) throws Exception {
+    public ProductDTO getProduct(String id) {
         // Chiedo al repository di trovare l'entità
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se presente
@@ -44,13 +45,13 @@ public class ProductServiceImpl implements ProductService {
             return this.productMapper.toDto(productOptional.get());
         } else {
             // Se qualcosa non va lancia eccezione
-            throw new Exception("Prodotto non trovato");
+            throw new ResourceNotFoundException("Prodotto con ID " + id + " non trovato");
         }
 
     }
 
     @Override
-    public void deleteProduct(String id) throws Exception {
+    public void deleteProduct(String id) {
         // Chiedi al Repository di recuperare il prodotto
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se lo trovo
@@ -59,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
             this.productRepository.delete(productOptional.get());
         } else {
             // Se qualcosa non va lancia eccezione
-            throw new Exception("Prodotto non trovato.");
+            throw new ResourceNotFoundException("Prodotto con ID " + id + " non trovato");
         }
     }
 
@@ -78,14 +79,14 @@ public class ProductServiceImpl implements ProductService {
             // Restituisco il DTO che ho cancellato
             return deletedProduct;
         } else {
-            throw new Exception("Prodotto non trovato.");
+            throw new ResourceNotFoundException("Prodotto con ID " + id + " non trovato");
         }
     }
     */
 
 
     @Override
-    public ProductDTO updateProduct(ProductDTO productDTO) throws Exception {
+    public ProductDTO modifyProduct(ProductDTO productDTO) {
         // Chiedi al repository di cercare il DTO nel db
         Optional<ProductEntity> productOptional = this.productRepository.findById(productDTO.getId());
         // Se presente
@@ -100,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
             return this.productMapper.toDto(savedProduct);
         }
         else {
-            throw new Exception("prodotto non trovato");
+            throw new ResourceNotFoundException("Prodotto con ID " + productDTO.getId() + " non trovato");
         }
     }
 
