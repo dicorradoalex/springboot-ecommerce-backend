@@ -18,6 +18,8 @@ public record ProductDTO(
         BigDecimal price,
 
         String description,
+
+        @NotNull(message = "La categoria è obbligatoria")
         CategoryDTO category) {
 
 }
