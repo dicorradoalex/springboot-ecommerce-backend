@@ -95,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
             // Estrai dall'Optional l'entità
             ProductEntity productToUpdate = productOptional.get();
             // Aggiorna l'entità utilizzando come valori quelli del DTO ricevuto come argomento
-            productToUpdate.setName(productDTO.name());
+            this.productMapper.updateEntityFromDto(productDTO, productToUpdate);
             // Salvo l'entità aggiornata
             ProductEntity savedProduct = this.productRepository.save(productToUpdate);
             // Converto l'oggetto salvato in DTO e lo restituisco al Controller

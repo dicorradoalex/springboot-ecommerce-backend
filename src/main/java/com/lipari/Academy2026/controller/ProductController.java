@@ -2,6 +2,7 @@ package com.lipari.Academy2026.controller;
 
 import com.lipari.Academy2026.dto.ProductDTO;
 import com.lipari.Academy2026.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ProductController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         // Chiedo al Service di creare un nuovo prodotto
         ProductDTO createdProduct = this.productService.createProduct(productDTO);
         // Se tutto ok restituisco 201 + prodotto creato
@@ -63,7 +64,7 @@ public class ProductController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO productDTO) {
         // Chiedo al Service di modificare il prodotto
         ProductDTO modifiedProduct = this.productService.updateProduct(productDTO);
         // Se è tutto ok -> 200 (restituiendo il prodotto aggiornato)
