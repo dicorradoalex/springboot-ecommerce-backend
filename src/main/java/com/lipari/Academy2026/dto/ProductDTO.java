@@ -1,10 +1,7 @@
 package com.lipari.Academy2026.dto;
 
-import lombok.Data;
+import java.util.UUID;
 
-@Data
-public class ProductDTO {
+public record ProductDTO(UUID id, String name, CategoryDTO category) {
 
-    String id;
-    String name;
 }

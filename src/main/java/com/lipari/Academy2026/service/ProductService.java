@@ -1,20 +1,20 @@
 package com.lipari.Academy2026.service;
 
 import com.lipari.Academy2026.dto.ProductDTO;
-import com.lipari.Academy2026.entity.ProductEntity;
-import org.springframework.http.ResponseEntity;
+
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductService {
 
-    public ProductDTO newProduct(ProductDTO productDTO);
+    public ProductDTO createProduct(ProductDTO productDTO);
 
-    public ProductDTO getProduct(String id);
+    public ProductDTO getProduct(UUID id);
 
-    public void deleteProduct(String id);
+    public void deleteProduct(UUID id);
 
-    public ProductDTO modifyProduct(ProductDTO productDTO);
+    public ProductDTO updateProduct(ProductDTO productDTO);
 
     public List<ProductDTO> getAllProducts();
 }

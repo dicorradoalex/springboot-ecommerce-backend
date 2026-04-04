@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -26,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO newProduct(ProductDTO productDTO) {
+    public ProductDTO createProduct(ProductDTO productDTO) {
         // DTO -> Entity
         ProductEntity product = this.productMapper.toEntity(productDTO);
         // Salvo la nuova entity nel db
@@ -36,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getProduct(String id) {
+    public ProductDTO getProduct(UUID id) {
         // Chiedo al repository di trovare l'entità
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se presente
@@ -51,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(String id) {
+    public void deleteProduct(UUID id) {
         // Chiedi al Repository di recuperare il prodotto
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se lo trovo
@@ -86,22 +87,22 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductDTO modifyProduct(ProductDTO productDTO) {
+    public ProductDTO updateProduct(ProductDTO productDTO) {
         // Chiedi al repository di cercare il DTO nel db
-        Optional<ProductEntity> productOptional = this.productRepository.findById(productDTO.getId());
+        Optional<ProductEntity> productOptional = this.productRepository.findById(productDTO.id());
         // Se presente
         if(productOptional.isPresent()) {
             // Estrai dall'Optional l'entità
             ProductEntity productToUpdate = productOptional.get();
             // Aggiorna l'entità utilizzando come valori quelli del DTO ricevuto come argomento
-            productToUpdate.setName(productDTO.getName());
+            productToUpdate.setName(productDTO.name());
             // Salvo l'entità aggiornata
             ProductEntity savedProduct = this.productRepository.save(productToUpdate);
             // Converto l'oggetto salvato in DTO e lo restituisco al Controller
             return this.productMapper.toDto(savedProduct);
         }
         else {
-            throw new ResourceNotFoundException("Prodotto con ID " + productDTO.getId() + " non trovato");
+            throw new ResourceNotFoundException("Prodotto con ID " + productDTO.id() + " non trovato");
         }
     }
 
