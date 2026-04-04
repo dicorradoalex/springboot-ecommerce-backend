@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface ProductService {
 
-    public ProductDTO newProduct(ProductDTO productDTO);
+    public ProductDTO createProduct(ProductDTO productDTO);
 
     public ProductDTO getProduct(String id) throws Exception;
 
     public void deleteProduct(String id) throws Exception;
 
-    public ProductDTO modifyProduct(ProductDTO productDTO) throws Exception;
+    public ProductDTO updateProduct(ProductDTO productDTO) throws Exception;
 
     public List<ProductDTO> getAllProducts();
 }

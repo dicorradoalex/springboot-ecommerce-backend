@@ -25,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO newProduct(ProductDTO productDTO) {
+    public ProductDTO createProduct(ProductDTO productDTO) {
         // DTO -> Entity
         ProductEntity product = this.productMapper.toEntity(productDTO);
         // Salvo la nuova entity nel db
@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
         // Chiedo al repository di trovare l'entità
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se presente
-        if(productOptional.isPresent()) {
+        if (productOptional.isPresent()) {
             // Entity -> DTO e restituisco al Controller
             return this.productMapper.toDto(productOptional.get());
         } else {
@@ -54,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
         // Chiedi al Repository di recuperare il prodotto
         Optional<ProductEntity> productOptional = this.productRepository.findById(id);
         // Se lo trovo
-        if(productOptional.isPresent()) {
+        if (productOptional.isPresent()) {
             // Cancello l'entità dal db
             this.productRepository.delete(productOptional.get());
         } else {
@@ -85,11 +85,11 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductDTO modifyProduct(ProductDTO productDTO) throws Exception {
+    public ProductDTO updateProduct(ProductDTO productDTO) throws Exception {
         // Chiedi al repository di cercare il DTO nel db
         Optional<ProductEntity> productOptional = this.productRepository.findById(productDTO.getId());
         // Se presente
-        if(productOptional.isPresent()) {
+        if (productOptional.isPresent()) {
             // Estrai dall'Optional l'entità
             ProductEntity productToUpdate = productOptional.get();
             // Aggiorna l'entità utilizzando come valori quelli del DTO ricevuto come argomento
@@ -98,8 +98,7 @@ public class ProductServiceImpl implements ProductService {
             ProductEntity savedProduct = this.productRepository.save(productToUpdate);
             // Converto l'oggetto salvato in DTO e lo restituisco al Controller
             return this.productMapper.toDto(savedProduct);
-        }
-        else {
+        } else {
             throw new Exception("prodotto non trovato");
         }
     }
