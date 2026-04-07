@@ -26,15 +26,16 @@ public class OrderEntryEntity {
     @ToString.Exclude // Evita loop infiniti con il toString di ProductEntity
     private ProductEntity product;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    @ToString.Exclude // Evita loop infiniti con il toString di OrderEntity
-    private OrderEntity orderEntity;
-
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false)
     private BigDecimal price;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @ToString.Exclude // Evita loop infiniti con il toString di OrderEntity
+    private OrderEntity order;
+
 
 }

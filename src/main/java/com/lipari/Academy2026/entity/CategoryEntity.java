@@ -18,7 +18,7 @@ import lombok.*;
 public class CategoryEntity {
 
     @Id // indica la chiave primaria
-    @GeneratedValue(strategy = GenerationType.UUID) // Genera ID univico
+    @GeneratedValue(strategy = GenerationType.UUID) // Genera ID univoco
     @EqualsAndHashCode.Include // Genera Equals e HashCode basandosi su questo campo
     private UUID id;
 

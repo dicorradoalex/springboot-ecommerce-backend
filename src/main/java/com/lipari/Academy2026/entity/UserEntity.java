@@ -1,11 +1,10 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "user")

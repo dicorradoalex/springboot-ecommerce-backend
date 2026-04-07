@@ -11,11 +11,11 @@ import java.util.List;
 @Mapper(componentModel = "spring",  uses = {CategoryMapper.class})
 public interface ProductMapper {
 
-    ProductDTO toDto(ProductEntity pEntity);
+    ProductDTO toDto(ProductEntity entity);
 
-    ProductEntity toEntity(ProductDTO pDto);
+    ProductEntity toEntity(ProductDTO dto);
 
-    List<ProductDTO> toDtoList(List<ProductEntity> pEntities);
+    List<ProductDTO> toDtoList(List<ProductEntity> entityList);
 
     /*
         updateEntityFromDto(...) permette di prendere i dati dal DTO e spalmarli nell'entità.

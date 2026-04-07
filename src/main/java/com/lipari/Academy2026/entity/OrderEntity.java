@@ -2,10 +2,8 @@ package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
 
-import java.text.DateFormat;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
@@ -37,7 +35,7 @@ public class OrderEntity {
     @Column(name = "order_time", nullable = false)
     LocalDateTime orderTime;
 
-    @OneToMany(mappedBy = "orderEntity")
+    @OneToMany(mappedBy = "order")
     @ToString.Exclude
     private List<OrderEntryEntity> entries;
 
