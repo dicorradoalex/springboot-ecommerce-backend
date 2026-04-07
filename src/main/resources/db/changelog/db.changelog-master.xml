@@ -7,5 +7,6 @@
     <include file="db/changelog/changes/01-create-initial-schema.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/02-add-price-and-description-to-product.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/03-set-category-id-not-nullable.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/20260407165029.yaml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
