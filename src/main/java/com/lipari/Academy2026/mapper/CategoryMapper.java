@@ -9,9 +9,9 @@ import java.util.List;
 @Mapper(componentModel = "spring") // Permette a Spring di gestire il Mapper come un suo componente (Bean). Questo permette di poterlo utilizzare da altre parti senza fare new CategoryMapperImpl()
 public interface CategoryMapper {
 
-    CategoryDTO toDto(CategoryEntity pEntity);
+    CategoryDTO toDto(CategoryEntity entity);
 
-    CategoryEntity toEntity(CategoryDTO pDto);
+    CategoryEntity toEntity(CategoryDTO dto);
 
     List<CategoryDTO> toDtoList(List<CategoryEntity> entityList);
 

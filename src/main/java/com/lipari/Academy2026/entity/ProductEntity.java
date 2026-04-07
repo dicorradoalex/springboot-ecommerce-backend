@@ -14,7 +14,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder // La sto utilizzando? mi serve?
 
 public class ProductEntity {
 

@@ -1,10 +1,10 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.*;
 
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -26,5 +26,9 @@ public class UserEntity {
     private String address;
     private String city;
     private String country;
+
+    @OneToMany(mappedBy = "user")
+    private List<OrderEntity> orders;
+
 
 }
