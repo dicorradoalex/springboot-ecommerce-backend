@@ -1,11 +1,9 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,12 +23,12 @@ public class OrderEntryEntity {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @ToString.Exclude // Evita loop infiniti con il toString di user
+    @ToString.Exclude // Evita loop infiniti con il toString di ProductEntity
     private ProductEntity product;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @ToString.Exclude // Evita loop infiniti con il toString di user
+    @ToString.Exclude // Evita loop infiniti con il toString di OrderEntity
     private OrderEntity orderEntity;
 
     @Column(nullable = false)
