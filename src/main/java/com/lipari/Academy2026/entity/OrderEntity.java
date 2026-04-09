@@ -1,42 +1,70 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
-
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Table(name = "orders") // orders perché order è una parola riservata in sql
+@Table(name = "orders")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Lombok genera equals e hashCode usando solo i campi indicati esplicitamente
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
-@NoArgsConstructor // Genera un costruttore vuoto, serve per JPA per istanziare l'entità quando recupera i dati dal database
-@AllArgsConstructor // Genera un costruttore con tutti i parametri
-@Builder // Per costrutire un oggetto tipo: CategoryEntity.builder().name("Elettronica").build();
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderEntity {
 
-    @Id // indica la chiave primaria
-    @GeneratedValue(strategy = GenerationType.UUID) // Genera ID univico
-    @EqualsAndHashCode.Include // Genera Equals e HashCode basandosi su questo campo
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude // Evita loop infiniti con il toString di user
+    @ToString.Exclude
     private UserEntity user;
 
     @Column(nullable = false)
     private String status;
 
     @Column(name = "order_time", nullable = false)
-    LocalDateTime orderTime;
+    private LocalDateTime orderTime;
 
     @OneToMany(mappedBy = "order")
     @ToString.Exclude
     private List<OrderEntryEntity> entries;
 
 }
+
+/*
+    NOTE DIDATTICHE
+
+    Annotazioni LOMBOK
+    - @Table(name = "orders")
+      Si usa il plurale perché "order" è una parola riservata in SQL (ORDER BY).
+
+    - @ToString.Exclude
+      Serve su 'user' e 'entries' per evitare StackOverflow nei log.
+
+    Annotazioni JPA (Mappatura Database)
+    - @ManyToOne (OWNER SIDE verso User)
+      L'ordine "possiede" la chiave esterna 'user_id'. È il lato che proprietario del
+      il legame con l'utente.
+
+    - @OneToMany (INVERSE SIDE verso OrderEntry)
+      L'ordine non ha colonne per le entries nel DB. Il legame è "mappato"
+      dal campo 'order' presente nella classe OrderEntryEntity.
+
+    - Fetch Strategy
+      1. Verso User: @ManyToOne è EAGER di default (si consiglia LAZY).
+      2. Verso Entries: @OneToMany è LAZY di default (ottimo per le performance).
+
+    - LocalDateTime
+      Mappa automaticamente la data e l'ora nel formato corretto del database
+      (TIMESTAMP o DATETIME).
+-----------
+
+*/

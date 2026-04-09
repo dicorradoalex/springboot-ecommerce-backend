@@ -10,21 +10,56 @@ import lombok.*;
 @Table(name = "category")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Lombok genera equals e hashCode usando solo i campi indicati esplicitamente
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
-@NoArgsConstructor // Genera un costruttore vuoto, serve per JPA per istanziare l'entità quando recupera i dati dal database
-@AllArgsConstructor // Genera un costruttore con tutti i parametri
-@Builder // Per costrutire un oggetto tipo: CategoryEntity.builder().name("Elettronica").build();
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CategoryEntity {
 
-    @Id // indica la chiave primaria
-    @GeneratedValue(strategy = GenerationType.UUID) // Genera ID univoco
-    @EqualsAndHashCode.Include // Genera Equals e HashCode basandosi su questo campo
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
+    @Column(nullable = false, length = 100)
     private String name;
 
     @OneToMany(mappedBy = "category")
     @ToString.Exclude
     private List<ProductEntity> productsList;
 }
+
+/*
+    NOTE DIDATTICHE
+
+    Annotazioni LOMBOK
+
+    - @Builder
+      Permette la creazione fluida dell'oggetto. Obbligatorio @AllArgsConstructor.
+
+    - @EqualsAndHashCode.Include
+      Limita equals/hashCode solo ai campi scelti.
+      Richiede (onlyExplicitlyIncluded = true) sulla classe.
+
+    - @ToString.Exclude
+      Evita il loop infinito (StackOverflow) con la lista di prodotti associati.
+
+    Annotazioni JPA (Mappatura Database)
+
+    - @OneToMany (INVERSE SIDE)
+      Definisce il lato "riflesso" della relazione. Una categoria ha molti prodotti.
+
+    - mappedBy = "category"
+      Punta al nome della variabile 'category' presente nella classe ProductEntity (Owner Side).
+      Indispensabile per non creare tabelle di giunzione inutili nel database.
+
+    - @Column(nullable = false, length = 100)
+      Garantisce che il nome della categoria sia obbligatorio e non superi i 100 caratteri.
+
+-----------
+    SINTESI
+    - Lato Relazione: Inverse Side (non possiede la FK).
+    - Legame: Mappato sul campo 'category' dell'altra entità.
+    - Caricamento: Default LAZY (corretto per le liste).
+*/
