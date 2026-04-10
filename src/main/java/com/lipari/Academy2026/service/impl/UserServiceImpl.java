@@ -7,12 +7,11 @@ import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.UserMapper;
 import com.lipari.Academy2026.repository.UserRepository;
 import com.lipari.Academy2026.service.UserService;
-import org.mapstruct.MappingTarget;
+
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
