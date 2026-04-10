@@ -140,5 +140,6 @@ public class CategoryServiceImpl implements CategoryService {
     - Gestione 409 (AlreadyExistsException)
       Prima di creare nuove risorse, il Service controlla eventuali duplicati
       (es. email o codici univoci) lanciando un'eccezione di conflitto.
+
 -----------
 */
