@@ -7,7 +7,6 @@ import com.lipari.Academy2026.mapper.ProductMapper;
 import com.lipari.Academy2026.repository.CategoryRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
 import com.lipari.Academy2026.service.ProductService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
