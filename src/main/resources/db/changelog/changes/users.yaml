@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-user
+      author: academy2026
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(150)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: address
+                  type: VARCHAR(200)
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+              - column:
+                  name: country
+                  type: VARCHAR(50)

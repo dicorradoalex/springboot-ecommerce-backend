@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-product
+      author: academy2026
+      changes:
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: DECIMAL(10, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
