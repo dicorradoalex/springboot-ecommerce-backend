@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-orders
+      author: academy2026
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_order_user
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: order_time
+                  type: DATETIME
+                  constraints:
+                    nullable: false
