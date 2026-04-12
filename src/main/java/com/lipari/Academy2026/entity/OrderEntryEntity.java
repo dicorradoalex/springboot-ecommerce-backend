@@ -32,6 +32,9 @@ public class OrderEntryEntity {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(nullable = false)
+    private BigDecimal total;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     @ToString.Exclude

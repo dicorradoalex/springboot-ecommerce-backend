@@ -18,7 +18,11 @@ public record OrderEntryDTO(
 
         @NotNull(message = "Il prezzo è obbligatorio")
         @Positive(message = "Il prezzo deve essere maggiore di zero")
-        BigDecimal price
+        BigDecimal price,
+
+        @NotNull
+        @Positive
+        BigDecimal total
 ) {
 }
 

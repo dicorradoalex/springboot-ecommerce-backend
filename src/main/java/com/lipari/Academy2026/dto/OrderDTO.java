@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +25,11 @@ public record OrderDTO(
 
         @NotEmpty(message = "L'ordine deve contenere almeno un prodotto")
         @Valid
-        List<OrderEntryDTO> entries) {
+        List<OrderEntryDTO> entries,
+
+        @Positive
+        @NotNull
+        BigDecimal total){
 }
 
 /*

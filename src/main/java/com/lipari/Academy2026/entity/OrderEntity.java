@@ -1,6 +1,8 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +38,9 @@ public class OrderEntity {
     @OneToMany(mappedBy = "order")
     @ToString.Exclude
     private List<OrderEntryEntity> entries;
+
+    @Column(name = "total", nullable = false)
+    private BigDecimal total;
 
 }
 
