@@ -34,7 +34,7 @@ public record UserDTO(
         String country,
 
         @Valid
-        List<OrderDTO> orders) {
+        List<OrderResponseDTO> orders) {
 }
 
 /*
@@ -61,7 +61,7 @@ public record UserDTO(
     - @Valid (su Liste/Oggetti annidati)
       È fondamentale per la "Validazione Ricorsiva".
       Esempio: Se invio un utente con una lista di ordini, @Valid dice a Spring
-      di controllare anche ogni singolo OrderDTO dentro la lista. Senza di questo,
+      di controllare anche ogni singolo OrderResponseDTO dentro la lista. Senza di questo,
       gli ordini verrebbero accettati anche se contengono dati errati.
 
     - @NotEmpty (per le Liste)

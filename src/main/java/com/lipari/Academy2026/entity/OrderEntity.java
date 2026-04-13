@@ -1,5 +1,6 @@
 package com.lipari.Academy2026.entity;
 
+import com.lipari.Academy2026.enums.OrderStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -31,7 +32,8 @@ public class OrderEntity {
     private UserEntity user;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(name = "order_time", nullable = false)
     private LocalDateTime orderTime;
@@ -71,6 +73,10 @@ public class OrderEntity {
     - LocalDateTime
       Mappa automaticamente la data e l'ora nel formato corretto del database
       (TIMESTAMP o DATETIME).
+
+    - @Enumerated(EnumType.STRING)
+      Con questa annotazione JPA salva il valore come una stringa e non come indice (cmportamento
+      di default)
 -----------
 
 */

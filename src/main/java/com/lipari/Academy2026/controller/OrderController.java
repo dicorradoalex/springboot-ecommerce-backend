@@ -1,6 +1,6 @@
 package com.lipari.Academy2026.controller;
 
-import com.lipari.Academy2026.dto.OrderDTO;
+import com.lipari.Academy2026.dto.OrderResponseDTO;
 import com.lipari.Academy2026.dto.OrderRequestDTO;
 import com.lipari.Academy2026.service.OrderService;
 import jakarta.validation.Valid;
@@ -21,8 +21,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/new")
-    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDto) {
-        OrderDTO createdOrder = this.orderService.createOrder(orderRequestDto);
+    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDto) {
+        OrderResponseDTO createdOrder = this.orderService.createOrder(orderRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 

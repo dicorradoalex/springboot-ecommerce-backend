@@ -40,10 +40,10 @@ public record OrderEntryDTO(
       Controlla solo che l'oggetto non sia null.
       Accetta stringhe vuote "" o spazi " ". Si usa per numeri e oggetti.
 
-    OMISSIONE DI OrderDTO order
+    OMISSIONE DI OrderResponseDTO order
 
-    - Se OrderDTO contiene una List<OrderEntryDTO> e OrderEntryDTO contiene
-      un OrderDTO, il serializzatore JSON (Jackson) entrerà in un loop infinito
+    - Se OrderResponseDTO contiene una List<OrderEntryDTO> e OrderEntryDTO contiene
+      un OrderResponseDTO, il serializzatore JSON (Jackson) entrerà in un loop infinito
       provando a scriverli.
     - Soluzione: Nel DTO della riga d'ordine (Entry) si omette il riferimento
       all'ordine padre, poiché l'informazione è già implicita.

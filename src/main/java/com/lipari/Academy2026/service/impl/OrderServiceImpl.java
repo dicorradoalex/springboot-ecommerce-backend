@@ -1,12 +1,13 @@
 package com.lipari.Academy2026.service.impl;
 
-import com.lipari.Academy2026.dto.OrderDTO;
+import com.lipari.Academy2026.dto.OrderResponseDTO;
 import com.lipari.Academy2026.dto.OrderEntryRequestDTO;
 import com.lipari.Academy2026.dto.OrderRequestDTO;
 import com.lipari.Academy2026.entity.OrderEntity;
 import com.lipari.Academy2026.entity.OrderEntryEntity;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.entity.UserEntity;
+import com.lipari.Academy2026.enums.OrderStatus;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.OrderMapper;
 import com.lipari.Academy2026.repository.OrderRepository;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO createOrder(OrderRequestDTO orderRequestDto) {
+    public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDto) {
 
         // Verifica se l'utente "richiesto" esiste nel db
         Optional<UserEntity> user = this.userRepository.findById(orderRequestDto.userId());
@@ -45,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         // Inizializza l'ordine "richiesto"
         OrderEntity newOrder = OrderEntity.builder()
                 .user(user.get())
-                .status("CREATED") // Da rivedere (fare un enum)
+                .status(OrderStatus.CREATED)
                 .orderTime(LocalDateTime.now())
                 .total(BigDecimal.ZERO)
                 .entries(new ArrayList<>())
@@ -75,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
         // Salvo
         this.orderRepository.save(newOrder);
-        OrderDTO orderCreated = this.orderMapper.toDto(newOrder);
+        OrderResponseDTO orderCreated = this.orderMapper.toDto(newOrder);
         return orderCreated;
     }
 }
