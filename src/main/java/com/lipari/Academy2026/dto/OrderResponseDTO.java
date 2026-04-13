@@ -12,7 +12,7 @@ public record OrderResponseDTO(
         UserDTO user,
         OrderStatus status,
         LocalDateTime orderTime,
-        List<OrderEntryDTO> entries,
+        List<OrderEntryResponseDTO> entries,
         BigDecimal total){
 }
 

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record OrderEntryDTO(
+public record OrderEntryResponseDTO(
         UUID id,
 
         @NotNull(message = "Il prodotto è obbligatorio")
@@ -42,7 +42,7 @@ public record OrderEntryDTO(
 
     OMISSIONE DI OrderResponseDTO order
 
-    - Se OrderResponseDTO contiene una List<OrderEntryDTO> e OrderEntryDTO contiene
+    - Se OrderResponseDTO contiene una List<OrderEntryResponseDTO> e OrderEntryResponseDTO contiene
       un OrderResponseDTO, il serializzatore JSON (Jackson) entrerà in un loop infinito
       provando a scriverli.
     - Soluzione: Nel DTO della riga d'ordine (Entry) si omette il riferimento
