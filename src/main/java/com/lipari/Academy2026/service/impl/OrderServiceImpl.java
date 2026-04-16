@@ -116,5 +116,34 @@ public class OrderServiceImpl implements OrderService {
         // Converto la lista di entità in lista di DTO e restituisco
         return this.orderMapper.toDtoList(ordersList);
     }
+
+    @Override
+    @Transactional
+    public OrderResponseDTO cancelOrder(UUID orderId) {
+        // Cerco l'ordine nel DB
+        Optional<OrderEntity> orderOptional = this.orderRepository.findById(orderId);
+
+        // Controllo se esiste
+        if (!orderOptional.isPresent()) {
+            throw new ResourceNotFoundException("Ordine con ID: " + orderId + " non trovato");
+        }
+
+        OrderEntity order = orderOptional.get();
+
+        // Controllo lo stato attuale:
+        // Se l'ordine è già SPEDITO o CONSEGNATO, non si può annullare
+        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("Impossibile annullare l'ordine: è già stato spedito o consegnato.");
+        }
+
+        // Se tutto ok, cambio lo stato in CANCELED
+        order.setStatus(OrderStatus.CANCELED);
+
+        // Salvo l'entità aggiornata
+        this.orderRepository.save(order);
+
+        // Converto in DTO e restituisco
+        return this.orderMapper.toDto(order);
+    }
 }
 

@@ -40,6 +40,12 @@ public class OrderController {
         List<OrderResponseDTO> ordersList = this.orderService.getOrdersByUser(userId);
         return ResponseEntity.ok(ordersList);
     }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable UUID id) {
+        OrderResponseDTO canceledOrder = this.orderService.cancelOrder(id);
+        return ResponseEntity.ok(canceledOrder);
+    }
 }
 
 

@@ -13,5 +13,7 @@ public interface OrderService {
 
     OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatus newStatus);
 
+    public OrderResponseDTO cancelOrder(UUID orderId);
+
     List<OrderResponseDTO> getOrdersByUser(UUID userId);
 }
