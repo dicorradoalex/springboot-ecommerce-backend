@@ -1,5 +1,6 @@
 package com.lipari.Academy2026.entity;
 
+import com.lipari.Academy2026.enums.UserRole;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
@@ -30,6 +31,13 @@ public class UserEntity {
 
     @Column(unique = true, nullable = false, length = 150)
     private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role;
 
     @Column(length = 200)
     private String address;
