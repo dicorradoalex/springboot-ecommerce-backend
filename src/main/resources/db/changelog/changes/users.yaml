@@ -37,3 +37,22 @@ databaseChangeLog:
               - column:
                   name: country
                   type: VARCHAR(50)
+
+# Aggiunti i campi password e ruolo
+  - changeSet:
+      id: 20260416160135
+      author: dicorradoalex
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
