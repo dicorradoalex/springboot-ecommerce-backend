@@ -67,13 +67,12 @@ public class OrderServiceImpl implements OrderService {
                     .quantity(entry.quantity())
                     .price(product.get().getPrice())
                     .total(product.get().getPrice().multiply(BigDecimal.valueOf(entry.quantity())))
-                    .order(newOrder) // la collego all'ordine creato
                     .build();
 
             newOrder.setTotal(newOrder.getTotal().add(newOrderEntry.getTotal()));
 
             // L'aggiungo alla lista del nuovo ordine
-            newOrder.getEntries().add(newOrderEntry);
+            newOrder.addEntry(newOrderEntry);
         }
 
         // Salvo

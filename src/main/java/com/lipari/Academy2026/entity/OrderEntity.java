@@ -45,6 +45,16 @@ public class OrderEntity {
     @Column(name = "total", nullable = false)
     private BigDecimal total;
 
+    // Si occupa di instaurare il legame OrderEntity-OrderEntryEntity
+    // Ti evita di gestire due Set (uno per lato)
+    public void addEntry(OrderEntryEntity entry) {
+        if (entry != null) {
+            this.entries.add(entry);
+            entry.setOrder(this);
+        }
+    }
+
+
 }
 
 /*
