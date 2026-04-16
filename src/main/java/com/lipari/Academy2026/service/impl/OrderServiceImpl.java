@@ -125,9 +125,8 @@ public class OrderServiceImpl implements OrderService {
         Optional<OrderEntity> orderOptional = this.orderRepository.findById(orderId);
 
         // Controllo se esiste
-        if (!orderOptional.isPresent()) {
+        if (!orderOptional.isPresent())
             throw new ResourceNotFoundException("Ordine con ID: " + orderId + " non trovato");
-        }
 
         OrderEntity order = orderOptional.get();
 
