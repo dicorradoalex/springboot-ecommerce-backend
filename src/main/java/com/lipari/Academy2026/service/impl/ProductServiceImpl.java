@@ -1,6 +1,7 @@
 package com.lipari.Academy2026.service.impl;
 
 import com.lipari.Academy2026.dto.ProductDTO;
+import com.lipari.Academy2026.entity.CategoryEntity;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.ProductMapper;
@@ -84,22 +85,35 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public ProductDTO updateProduct(ProductDTO productDTO) {
-        // Chiedi al repository di cercare il DTO nel db
+
+        // Cerco il prodotto nel database
         Optional<ProductEntity> productOptional = this.productRepository.findById(productDTO.id());
-        // Se presente
-        if(productOptional.isPresent()) {
-            // Estrai dall'Optional l'entità
-            ProductEntity productToUpdate = productOptional.get();
-            // Aggiorna l'entità utilizzando come valori quelli del DTO ricevuto come argomento
-            this.productMapper.updateEntityFromDto(productDTO, productToUpdate);
-            // Salvo l'entità aggiornata
-            ProductEntity savedProduct = this.productRepository.save(productToUpdate);
-            // Converto l'oggetto salvato in DTO e lo restituisco al Controller
-            return this.productMapper.toDto(savedProduct);
-        }
-        else {
+        if (!productOptional.isPresent())
             throw new ResourceNotFoundException("Prodotto con ID " + productDTO.id() + " non trovato");
+
+        // Estraggo il prodotto da aggiornare che ho trovato
+        ProductEntity productToUpdate = productOptional.get();
+
+        // Gestione categoria
+        UUID actualCategoryId = productToUpdate.getCategory().getId();
+        UUID newCategoryId = productDTO.category().id();
+
+        // Se le categorie sono diverse
+        if (!actualCategoryId.equals(newCategoryId)) {
+            // Cerco la nuova categoria nel database
+            Optional<CategoryEntity> newCategoryOptional = this.categoryRepository.findById(newCategoryId);
+            if (!newCategoryOptional.isPresent())
+                throw new ResourceNotFoundException("Categoria con ID: " + newCategoryId + " non trovata.");
+            // E la imposto come categoria del prodotto
+            productToUpdate.setCategory(newCategoryOptional.get());
         }
+
+        // Aggiorno gli altri campi dal DTO
+        this.productMapper.updateEntityFromDto(productDTO, productToUpdate);
+
+        // Salvo e Restituisco
+        ProductEntity savedProduct = this.productRepository.save(productToUpdate);
+        return this.productMapper.toDto(savedProduct);
     }
 
     @Override

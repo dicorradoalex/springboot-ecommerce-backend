@@ -38,7 +38,6 @@ public interface ProductMapper {
      */
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "category", ignore = true) // Momentaneo
     void updateEntityFromDto(ProductDTO dto, @MappingTarget ProductEntity entity);
 
 }
