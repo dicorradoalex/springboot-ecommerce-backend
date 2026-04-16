@@ -4,8 +4,6 @@ import com.lipari.Academy2026.dto.UserRegistrationRequestDTO;
 import com.lipari.Academy2026.dto.UserResponseDTO;
 import com.lipari.Academy2026.entity.UserEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
