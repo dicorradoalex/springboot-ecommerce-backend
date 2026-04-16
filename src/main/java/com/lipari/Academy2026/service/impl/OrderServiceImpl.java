@@ -8,6 +8,7 @@ import com.lipari.Academy2026.entity.OrderEntryEntity;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.entity.UserEntity;
 import com.lipari.Academy2026.enums.OrderStatus;
+import com.lipari.Academy2026.exception.InvalidOrderStateException;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.OrderMapper;
 import com.lipari.Academy2026.repository.OrderRepository;
@@ -132,9 +133,8 @@ public class OrderServiceImpl implements OrderService {
 
         // Controllo lo stato attuale:
         // Se l'ordine è già SPEDITO o CONSEGNATO, non si può annullare
-        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
-            throw new IllegalStateException("Impossibile annullare l'ordine: è già stato spedito o consegnato.");
-        }
+        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED)
+            throw new InvalidOrderStateException("Impossibile annullare l'ordine: è già stato spedito o consegnato.");
 
         // Se tutto ok, cambio lo stato in CANCELED
         order.setStatus(OrderStatus.CANCELED);

@@ -42,4 +42,16 @@ public class GlobalExceptionHandler {
         // Restituisci l'oggetto (che diventerà JSON) e specifica lo stato HTTP 409
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
+    // Intercetta specificatamente le AlreadyExistsException
+    @ExceptionHandler(InvalidOrderStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOrderState(InvalidOrderStateException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(), // Estrai il codice dell'errore (400,)
+                ex.getMessage(), // Estrai il messaggio scritto nel Service
+                LocalDateTime.now() // Cattura l'orario
+        );
+        // Restituisci l'oggetto (che diventerà JSON) e specifica lo stato HTTP 400,
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
