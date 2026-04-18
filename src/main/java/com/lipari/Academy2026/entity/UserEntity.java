@@ -95,6 +95,15 @@ public class UserEntity implements UserDetails {
 /*
     NOTE DIDATTICHE
 
+    Scurity
+
+    - UserDetails (I)
+      Permette a Spring Security di gestire (leggere) gli utenti. Ha due metodi principali
+        - getAuthorities(): Trasforma il campo role (USER/ADMIN) in una lista di permessi
+                            comprensibili al framework (es. ROLE_USER)
+        - getPassword() e
+          getUsername(): Indicano a Spring quali campi del database usare per le credenziali
+
     Annotazioni LOMBOK
 
     - @Builder

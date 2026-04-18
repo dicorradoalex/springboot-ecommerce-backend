@@ -80,3 +80,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
+
+/*
+        Il flusso del JwtAuthenticationFIlter è il seguente:
+
+            - Controlla se nell'Header Authorization c'è un token che inizia con Bearer
+            - Estrae il token e chiede al JwtService chi è l'utente
+            - Se il token è valido, "pomuove" la richiesta come autenticata mettendola nel SecurityContextHolder
+ */

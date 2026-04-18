@@ -10,7 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// Recupera gli utenti dal db quando qualcuno prova a loggarsi
+/*
+    È il componente che sa come recuperare gli utenti nel database quando qualcuno
+    prova a loggarsi.
+    Implementa UserDetailsService.
+ */
+
 
 @Service
 @RequiredArgsConstructor
