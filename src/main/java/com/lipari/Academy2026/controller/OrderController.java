@@ -31,15 +31,10 @@ public class OrderController {
 
     @GetMapping("/my-orders")
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
-        // Recupero l'utente autenticato dal contesto di sicurezza di Spring
-        // Il "Principal" contiene l'oggetto UserEntity che abbiamo inserito nel filtro JWT
-        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        // Chiedo al Service di recuperare gli ordini dell'utente loggato.
+        List<OrderResponseDTO> myOrders = this.orderService.getMyOrders();
 
-        // Recupero la lista degli ordini dal service usando l'ID dell'utente loggato
-        List<OrderResponseDTO> myOrders = this.orderService.getOrdersByUser(currentUser.getId());
-
-        // Restituisco la lista (anche se vuota []) con stato 200 OK
+        // Restituisco la lista con stato 200 OK
         return ResponseEntity.ok(myOrders);
     }
 
@@ -50,12 +45,6 @@ public class OrderController {
 
         OrderResponseDTO updatedOrder = this.orderService.updateOrderStatus(id, newStatus);
         return ResponseEntity.ok(updatedOrder);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByUser(@PathVariable UUID userId) {
-        List<OrderResponseDTO> ordersList = this.orderService.getOrdersByUser(userId);
-        return ResponseEntity.ok(ordersList);
     }
 
     @PatchMapping("/{id}/cancel")

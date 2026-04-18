@@ -105,15 +105,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
-        // Verifico se l'utente esiste
-        Optional<UserEntity> userOptional = this.userRepository.findById(userId);
+    public List<OrderResponseDTO> getMyOrders() {
+        // Recupero l'utente loggato dal contesto di sicurezza
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
-        if (!userOptional.isPresent())
-            throw new ResourceNotFoundException("Utente con ID: " + userId + " non trovato");
-
-        // Recupero la lista di entità dal repository
-        List<OrderEntity> ordersList = this.orderRepository.findByUser_Id(userId);
+        // Recupero la lista di entità dal repository usando l'ID dell'utente autenticato
+        List<OrderEntity> ordersList = this.orderRepository.findByUser_Id(currentUser.getId());
 
         // Converto la lista di entità in lista di DTO e restituisco
         return this.orderMapper.toDtoList(ordersList);
