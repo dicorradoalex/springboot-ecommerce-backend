@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     /**
-     * Definisco il sistema di criptazione delle password (Hashing).
+     * Sistema di criptazione delle password (Hashing).
      * Usiamo BCrypt.
      */
     @Bean
@@ -80,6 +80,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/product/**").permitAll()
                         .requestMatchers("/api/category/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+
+                        // Area Amministrativa: accessibile solo con ruolo ADMIN
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

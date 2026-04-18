@@ -2,6 +2,7 @@ package com.lipari.Academy2026.mapper;
 
 import com.lipari.Academy2026.dto.UserRegistrationRequestDTO;
 import com.lipari.Academy2026.dto.UserResponseDTO;
+import com.lipari.Academy2026.dto.UserUpdateRequestDTO;
 import com.lipari.Academy2026.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -20,5 +21,6 @@ public interface UserMapper {
     // Da Lista di entity a lista di DTO
     List<UserResponseDTO> toDtoList(List<UserEntity> entities);
 
-    void updateEntityFromDto(UserResponseDTO dto, @MappingTarget UserEntity entity);
+    // Aggiornamento UserEntity da DTO di richiesta
+    void updateEntityFromUpdateDto(UserUpdateRequestDTO dto, @MappingTarget UserEntity entity);
 }

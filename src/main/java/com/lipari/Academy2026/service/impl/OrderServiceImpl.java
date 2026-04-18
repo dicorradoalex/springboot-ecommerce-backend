@@ -16,6 +16,7 @@ import com.lipari.Academy2026.repository.ProductRepository;
 import com.lipari.Academy2026.repository.UserRepository;
 import com.lipari.Academy2026.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,14 +42,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDto) {
 
-        // Verifica se l'utente "richiesto" esiste nel db
-        Optional<UserEntity> user = this.userRepository.findById(orderRequestDto.userId());
-        if (!user.isPresent())
-            throw new ResourceNotFoundException("L'utente con ID: " + orderRequestDto.userId() + "non esiste nel db");
+        // Recupero utente loggato
+        // Invece di prenderlo dal DTO, lo estraiamo dal Token JWT
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
-        // Inizializza l'ordine "richiesto"
+        // Inizializza l'ordine
         OrderEntity newOrder = OrderEntity.builder()
-                .user(user.get())
+                .user(currentUser) // associa all'utente autenticato
                 .status(OrderStatus.CREATED)
                 .orderTime(LocalDateTime.now())
                 .total(BigDecimal.ZERO)
@@ -62,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
             if (!product.isPresent())
                 throw new ResourceNotFoundException("Prodotto con ID: " + entry.productId() + " non trovato");
 
-            // Crea una nuova entry prendendo i dati dal dto (usa il builder)
+            // Crea una nuova entry prendendo i dati dal dto
             OrderEntryEntity newOrderEntry = OrderEntryEntity.builder()
                     .product(product.get())
                     .quantity(entry.quantity())
@@ -104,15 +105,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
-        // Verifico se l'utente esiste
-        Optional<UserEntity> userOptional = this.userRepository.findById(userId);
+    public List<OrderResponseDTO> getMyOrders() {
+        // Recupero l'utente loggato dal contesto di sicurezza
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
-        if (!userOptional.isPresent())
-            throw new ResourceNotFoundException("Utente con ID: " + userId + " non trovato");
-
-        // Recupero la lista di entità dal repository
-        List<OrderEntity> ordersList = this.orderRepository.findByUser_Id(userId);
+        // Recupero la lista di entità dal repository usando l'ID dell'utente autenticato
+        List<OrderEntity> ordersList = this.orderRepository.findByUser_Id(currentUser.getId());
 
         // Converto la lista di entità in lista di DTO e restituisco
         return this.orderMapper.toDtoList(ordersList);

@@ -15,5 +15,5 @@ public interface OrderService {
 
     OrderResponseDTO cancelOrder(UUID orderId);
 
-    List<OrderResponseDTO> getOrdersByUser(UUID userId);
+    List<OrderResponseDTO> getMyOrders();
 }

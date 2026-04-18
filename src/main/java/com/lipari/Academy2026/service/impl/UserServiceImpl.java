@@ -2,6 +2,7 @@ package com.lipari.Academy2026.service.impl;
 
 import com.lipari.Academy2026.dto.UserRegistrationRequestDTO;
 import com.lipari.Academy2026.dto.UserResponseDTO;
+import com.lipari.Academy2026.dto.UserUpdateRequestDTO;
 import com.lipari.Academy2026.entity.UserEntity;
 import com.lipari.Academy2026.enums.UserRole;
 import com.lipari.Academy2026.exception.AlreadyExistsException;
@@ -10,6 +11,7 @@ import com.lipari.Academy2026.mapper.UserMapper;
 import com.lipari.Academy2026.repository.UserRepository;
 import com.lipari.Academy2026.service.UserService;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+
+
+    // USER AREA
+
+    @Override
+    public UserResponseDTO getCurrentUser() {
+        // Recupero l'utente autenticato dal contesto di sicurezza
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // Trasformo in DTO e restituisco
+        return this.userMapper.toDto(currentUser);
+    }
 
     @Override
     @Transactional
@@ -50,10 +65,39 @@ public class UserServiceImpl implements UserService {
         // Assegnazione ruolo di default
         user.setRole(UserRole.USER);
 
-        // Salvataggio e risposta
+        // Salvo e restituisco
         user = this.userRepository.save(user);
         return this.userMapper.toDto(user);
     }
+
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateUser(UserUpdateRequestDTO updateDTO) {
+        // Recupero utente loggato utilizzando l'id all'interno del token
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        // Cerco l'utente nel database usando l'ID dell'utente autenticato
+        Optional<UserEntity> userOpt = this.userRepository.findById(currentUser.getId());
+
+        if (!userOpt.isPresent())
+            // Caso teoricamente impossibile se il token è valido, ma gestito per sicurezza
+            throw new ResourceNotFoundException("Utente loggato non trovato nel database.");
+
+        UserEntity userToUpdate = userOpt.get();
+        // Aggiorno i campi dal nuovo DTO specifico (di sola richiesta)
+        this.userMapper.updateEntityFromUpdateDto(updateDTO, userToUpdate);
+        // Salvo l'entità aggiornata
+        UserEntity savedUser = this.userRepository.save(userToUpdate);
+        // Converto in DTO di risposta e restituisco
+        return this.userMapper.toDto(savedUser);
+    }
+
+
+
+
+    // ADMIN AREA
 
     @Override
     public UserResponseDTO getUser(UUID id) {
@@ -71,21 +115,6 @@ public class UserServiceImpl implements UserService {
         if(userOptional.isPresent())
             this.userRepository.deleteById(id);
         else throw new ResourceNotFoundException("Utente con ID: " + id + " non trovato.");
-    }
-
-    @Override
-    @Transactional
-    public UserResponseDTO updateUser(UserResponseDTO userResponseDTO) {
-        Optional<UserEntity> userOpt = this.userRepository.findById(userResponseDTO.id());
-        if(userOpt.isPresent()) {
-            UserEntity userToUpdate = userOpt.get();
-            this.userMapper.updateEntityFromDto(userResponseDTO, userToUpdate);
-            UserResponseDTO savedUser = this.userMapper.toDto(this.userRepository.save(userToUpdate));
-            return savedUser;
-        } else {
-            throw new ResourceNotFoundException("Utente con ID: " + userResponseDTO.id() + "non trovato.");
-        }
-
     }
 
     @Override

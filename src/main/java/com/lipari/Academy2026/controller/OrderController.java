@@ -26,6 +26,15 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
+    @GetMapping("/my-orders")
+    public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
+        // Chiedo al Service di recuperare gli ordini dell'utente loggato.
+        List<OrderResponseDTO> myOrders = this.orderService.getMyOrders();
+
+        // Restituisco la lista con stato 200 OK
+        return ResponseEntity.ok(myOrders);
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable UUID id,
@@ -33,12 +42,6 @@ public class OrderController {
 
         OrderResponseDTO updatedOrder = this.orderService.updateOrderStatus(id, newStatus);
         return ResponseEntity.ok(updatedOrder);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByUser(@PathVariable UUID userId) {
-        List<OrderResponseDTO> ordersList = this.orderService.getOrdersByUser(userId);
-        return ResponseEntity.ok(ordersList);
     }
 
     @PatchMapping("/{id}/cancel")
