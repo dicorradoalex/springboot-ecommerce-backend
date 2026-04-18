@@ -3,6 +3,7 @@ package com.lipari.Academy2026.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,14 +22,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity // Abilita la sicurezza web personalizzata in Spring Boot
 @RequiredArgsConstructor
-
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
     /**
-     * Sistema di criptazione delle password (Hashing).
+     * Definisco il sistema di criptazione delle password (Hashing).
      * Usiamo BCrypt.
      */
     @Bean
@@ -56,8 +56,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
-
     /**
      * Configurazione della sicurezza (regole di accesso)
      */
@@ -78,12 +76,24 @@ public class SecurityConfig {
                 // Regole accesso
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/product/**").permitAll()
-                        .requestMatchers("/api/category/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // Area Amministrativa: accessibile solo con ruolo ADMIN
+                        // Prodotti e Categorie: Lettura pubblica a tutti
+                        .requestMatchers(HttpMethod.GET, "/api/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/category/**").permitAll()
+                        
+                        // Prodotti e Categorie: Modifiche riservate agli ADMIN
+                        .requestMatchers(HttpMethod.POST, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/category/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/category/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/category/**").hasRole("ADMIN")
+
+                        // Area Amministrativa Utenti: accessibile solo con ruolo ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        
+                        // Tutto il resto (ordini, profilo personale) richiede solo l'autenticazione
                         .anyRequest().authenticated()
                 )
 
@@ -93,32 +103,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
-
-/*
-    NOTE DIDATTICHE
-
-    - @Configuration
-      Indica a Spring che quella classe è una classe di configurazione,
-      cioè una classe il cui scopo è dichiarare bean
-
-    - @Bean
-      Indica a Spring di prendere il valore restituito dal metodo e di registrarlo come bean nel contesto,
-      in modo che si possa iniettare ovunque serva.
-
-    - PasswordEncoder
-      È un'interfaccia: chi la implementa deve avere un metodo per criptare le password e uno per confrontarle
-
-    - ByCryptPasswordEncoder
-      È il password encoder di ByCrypt che andremo ad utilizzare
-
-    - SessionCreationPolicy.STATELESS
-     Il server "dimentica" l'utente non appena la richiesta è finita.
-     L'utente deve mostrare il JWT ad ogni nuova chiamata.
-
-    - AuthenticationManager
-      Utilizzato nel AuthService per dire a spring di controllare se le
-      credenziali inserite sono giuste.
-
-
- */

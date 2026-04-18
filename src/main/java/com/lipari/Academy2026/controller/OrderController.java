@@ -2,7 +2,6 @@ package com.lipari.Academy2026.controller;
 
 import com.lipari.Academy2026.dto.OrderRequestDTO;
 import com.lipari.Academy2026.dto.OrderResponseDTO;
-import com.lipari.Academy2026.enums.OrderStatus;
 import com.lipari.Academy2026.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,19 +34,11 @@ public class OrderController {
         return ResponseEntity.ok(myOrders);
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<OrderResponseDTO> updateOrderStatus(
-            @PathVariable UUID id,
-            @RequestParam OrderStatus newStatus) {
-
-        OrderResponseDTO updatedOrder = this.orderService.updateOrderStatus(id, newStatus);
-        return ResponseEntity.ok(updatedOrder);
-    }
-
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable UUID id) {
-        OrderResponseDTO canceledOrder = this.orderService.cancelOrder(id);
-        return ResponseEntity.ok(canceledOrder);
+            OrderResponseDTO canceledOrder = this.orderService.cancelOrder(id);
+            return ResponseEntity.ok(canceledOrder);
     }
 }
+
 

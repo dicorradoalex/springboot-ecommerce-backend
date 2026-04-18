@@ -120,19 +120,31 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponseDTO cancelOrder(UUID orderId) {
+        // Recupero utente loggato
+        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
         // Cerco l'ordine nel DB
         Optional<OrderEntity> orderOptional = this.orderRepository.findById(orderId);
 
-        // Controllo se esiste
-        if (!orderOptional.isPresent())
+        // Controllo se l'ordine esiste
+        if (!orderOptional.isPresent()) {
             throw new ResourceNotFoundException("Ordine con ID: " + orderId + " non trovato");
+        }
 
         OrderEntity order = orderOptional.get();
 
+        // Controllo proprietà
+        // Verifica che l'ID dell'utente dell'ordine sia uguale all'ID dell'utente loggato
+        if (!order.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException("Ordine con ID: " + orderId + " non trovato per questo utente.");
+        }
+
         // Controllo lo stato attuale:
         // Se l'ordine è già SPEDITO o CONSEGNATO, non si può annullare
-        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED)
+        if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
             throw new InvalidOrderStateException("Impossibile annullare l'ordine: è già stato spedito o consegnato.");
+        }
 
         // Se tutto ok, cambio lo stato in CANCELED
         order.setStatus(OrderStatus.CANCELED);
