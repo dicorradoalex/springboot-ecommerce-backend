@@ -95,6 +95,11 @@ public class UserEntity implements UserDetails {
 /*
     NOTE DIDATTICHE
 
+    Scurity
+
+    - UserDetails (I)
+      Indica a Spring come leggere l'email, la password e il ruolo dell'utente dal db
+
     Annotazioni LOMBOK
 
     - @Builder
