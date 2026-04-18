@@ -3,12 +3,20 @@ package com.lipari.Academy2026.service.impl;
 import com.lipari.Academy2026.config.JwtService;
 import com.lipari.Academy2026.dto.AuthResponseDTO;
 import com.lipari.Academy2026.dto.LoginRequestDTO;
+import com.lipari.Academy2026.dto.UserRegistrationRequestDTO;
+import com.lipari.Academy2026.dto.UserResponseDTO;
+import com.lipari.Academy2026.entity.UserEntity;
+import com.lipari.Academy2026.enums.UserRole;
+import com.lipari.Academy2026.exception.AlreadyExistsException;
+import com.lipari.Academy2026.mapper.UserMapper;
 import com.lipari.Academy2026.repository.UserRepository;
 import com.lipari.Academy2026.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +25,11 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO request) {
-
         // Validazione credenziali
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -31,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Recupero utente dal DB
         var user = userRepository.findByEmail(request.email())
-                .orElseThrow(); // già validato dall'autenticazione
+                .orElseThrow();
 
         // Generazione JWT
         String jwtToken = jwtService.generateToken(user);
@@ -39,26 +48,26 @@ public class AuthServiceImpl implements AuthService {
         // Risposta
         return new AuthResponseDTO(jwtToken, "Bearer");
     }
+
+    @Override
+    @Transactional
+    public UserResponseDTO registerUser(UserRegistrationRequestDTO registrationDTO) {
+        // Controllo se esiste già un utente con la stessa email
+        if (this.userRepository.existsByEmail(registrationDTO.email()))
+            throw new AlreadyExistsException("Email già registrata: " + registrationDTO.email());
+
+        // DTO -> Entity
+        UserEntity user = this.userMapper.toEntity(registrationDTO);
+
+        // Hashing della password per sicurezza
+        String encodedPassword = this.passwordEncoder.encode(registrationDTO.password());
+        user.setPassword(encodedPassword);
+
+        // Assegnazione ruolo di default (USER)
+        user.setRole(UserRole.USER);
+
+        // Salvo e restituisco DTO
+        user = this.userRepository.save(user);
+        return this.userMapper.toDto(user);
+    }
 }
-
-
-/*
-    NOTE DIDATTICHE - [AuthServiceImpl]
-
-    - AuthenticationManager:
-      Valida automaticamente email e password usando
-      UserDetailsService + PasswordEncoder.
-
-    - UsernamePasswordAuthenticationToken:
-      Contenitore standard di Spring per le credenziali.
-
-    - Flusso:
-      1. Autenticazione credenziali
-      2. Recupero utente
-      3. Generazione JWT
-      4. Restituzione token al client
-
-    - Bearer:
-      Indica che il token deve essere usato nell'header:
-      Authorization: Bearer <token>
-*/
