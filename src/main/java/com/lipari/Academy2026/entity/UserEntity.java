@@ -57,6 +57,10 @@ public class UserEntity implements UserDetails {
     @ToString.Exclude
     private List<OrderEntity> orders;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private CartEntity cart;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Trasformiamo il ruolo in un'autorità Spring (es. ROLE_USER, ROLE_ADMIN)
@@ -137,9 +141,20 @@ public class UserEntity implements UserDetails {
       solo alla chiamata del getter (es. user.getOrders()).
       Nota: @ManyToOne è invece EAGER di default.
 
+
+    RELAZIONI
+
+    - mappedBy = "user":
+       - La foreign key è nella tabella "carts"
+       - Questo è il lato inverso della relazione
+
+    - cascade = CascadeType.ALL:
+       - Le operazioni sull'utente si propagano al carrello
+       - delete user -> delete cart automatico
+
+    - orphanRemoval = true:
+       - Se il carrello viene scollegato dall'utente
+         viene eliminato dal database
+
 -----------
-    SINTESI
-    - Lato Relazione: Inverse Side.
-    - Vincoli: Email univoca e campi obbligatori (Name, Surname).
-    - Tabella: Nominata "users" per sicurezza SQL.
 */

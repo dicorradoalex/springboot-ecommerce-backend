@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-category
+      author: academy2026
+      changes:
+        - createTable:
+            tableName: category
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
