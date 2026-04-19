@@ -9,5 +9,7 @@
     <include file="db/changelog/changes/users.yaml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/orders.yaml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/order_entry.yaml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/cart.yaml" />
+    <include file="db/changelog/changes/cart.yaml" />
 
 </databaseChangeLog>

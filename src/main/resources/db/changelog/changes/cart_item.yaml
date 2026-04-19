@@ -1,10 +1,12 @@
 databaseChangeLog:
+
+# Crea tabella per CartItemEntity
   - changeSet:
-      id: create-table-category
-      author: academy2026
+      id: 20260419103459
+      author: dicorradoalex
       changes:
         - createTable:
-            tableName: category
+            tableName: cart_items
             columns:
               - column:
                   name: id
@@ -13,7 +15,23 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: name
-                  type: VARCHAR(100)
+                  name: cart_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cart_item_cart
+                    referencedTableName: carts
+                    referencedColumnNames: id
+              - column:
+                  name: product_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_cart_item_product
+                    referencedTableName: products
+                    referencedColumnNames: id
+              - column:
+                  name: quantity
+                  type: INT
                   constraints:
                     nullable: false
