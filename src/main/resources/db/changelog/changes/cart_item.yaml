@@ -28,7 +28,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_cart_item_product
-                    referencedTableName: products
+                    referencedTableName: product
                     referencedColumnNames: id
               - column:
                   name: quantity
