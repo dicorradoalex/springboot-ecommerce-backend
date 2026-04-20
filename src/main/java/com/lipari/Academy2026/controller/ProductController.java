@@ -1,19 +1,21 @@
 package com.lipari.Academy2026.controller;
 
-import com.lipari.Academy2026.dto.ProductResponseDTO;
-import com.lipari.Academy2026.service.ProductService;
+import com.lipari.Academy2026.dto.product.ProductRequestDTO;
+import com.lipari.Academy2026.dto.product.ProductResponseDTO;
+import com.lipari.Academy2026.service.product.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * AREA USER: Permette le operazioni di base sui prodotti
- * da parte di un utente normale.
- */
 
+/**
+ * Gestisce la visualizzazione e la ricerca dei prodotti a catalogo.
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/product")
@@ -26,17 +28,17 @@ public class ProductController {
      * Recupera i dettagli di un singolo prodotto tramite il suo ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable UUID id) {
-        // Chiedo al service di recuperare il prodotto
+    public ResponseEntity<ProductResponseDTO> getProduct(
+            @PathVariable UUID id) {
+
         ProductResponseDTO product = this.productService.getProduct(id);
-        // Se tutto ok, restituisci lo stato 200 e il dato nel corpo del body
         return ResponseEntity.ok(product);
     }
 
     /**
      * Recupera la lista completa di tutti i prodotti a catalogo.
      */
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
         List<ProductResponseDTO> products = this.productService.getAllProducts();
         return ResponseEntity.ok(products);
@@ -44,21 +46,62 @@ public class ProductController {
 
     /**
      * Cerca i prodotti per nome tramite un parametro di ricerca.
-     * Esempio: /api/product/search?name=smartphone
      */
     @GetMapping("/search")
-    public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam String name) {
+    public ResponseEntity<List<ProductResponseDTO>> searchProducts(
+            @RequestParam String name) {
+
         List<ProductResponseDTO> products = this.productService.searchProductsByName(name);
         return ResponseEntity.ok(products);
     }
 
     /**
-     * Filtra i prodotti in base alla loro categoria.
-     * Esempio: /api/product/category?name=Informatica
+     * Filtra i prodotti in base alla loro categoria (Legacy).
+     * Nota: È preferibile usare l'endpoint nidificato in CategoryController.
      */
     @GetMapping("/category")
-    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(@RequestParam(name = "name") String categoryName) {
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(
+            @RequestParam(name = "name") String categoryName) {
+
         List<ProductResponseDTO> products = this.productService.getProductsByCategory(categoryName);
         return ResponseEntity.ok(products);
+    }
+
+
+
+    // AREA ADMIN
+
+    /**
+     * Crea un nuovo prodotto nel catalogo.
+     */
+    @PostMapping
+    public ResponseEntity<ProductResponseDTO> createProduct(
+            @Valid @RequestBody ProductRequestDTO productRequestDTO) {
+
+        ProductResponseDTO createdProduct = this.productService.createProduct(productRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    }
+
+    /**
+     * Aggiorna i dati di un prodotto esistente.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> updateProduct(
+            @PathVariable UUID id,
+            @Valid @RequestBody ProductRequestDTO productRequestDTO) {
+
+        ProductResponseDTO modifiedProduct = this.productService.updateProduct(productRequestDTO, id);
+        return ResponseEntity.ok(modifiedProduct);
+    }
+
+    /**
+     * Elimina un prodotto dal catalogo tramite ID.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable UUID id) {
+
+        this.productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }

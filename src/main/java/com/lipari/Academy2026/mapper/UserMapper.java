@@ -1,8 +1,8 @@
 package com.lipari.Academy2026.mapper;
 
-import com.lipari.Academy2026.dto.UserRegistrationRequestDTO;
-import com.lipari.Academy2026.dto.UserResponseDTO;
-import com.lipari.Academy2026.dto.UserUpdateRequestDTO;
+import com.lipari.Academy2026.dto.auth.UserRegistrationRequestDTO;
+import com.lipari.Academy2026.dto.user.UserResponseDTO;
+import com.lipari.Academy2026.dto.user.UserUpdateRequestDTO;
 import com.lipari.Academy2026.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -12,15 +12,23 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    // Da richiesta di registrazione a Entity (per salvare nel DB)
+    /**
+     * Converte il DTO di registrazione in una nuova entità utente per il salvataggio.
+     */
     UserEntity toEntity(UserRegistrationRequestDTO registrationDTO);
 
-    // Da Entity a risposta (per inviare al client senza password)
+    /**
+     * Trasforma l'entità utente in un DTO di risposta sicuro (senza password).
+     */
     UserResponseDTO toDto(UserEntity entity);
 
-    // Da Lista di entity a lista di DTO
+    /**
+     * Trasforma una lista di entità utente in una lista di DTO di risposta.
+     */
     List<UserResponseDTO> toDtoList(List<UserEntity> entities);
 
-    // Aggiornamento UserEntity da DTO di richiesta
+    /**
+     * Aggiorna un'entità utente esistente con i dati provenienti dal DTO di aggiornamento.
+     */
     void updateEntityFromUpdateDto(UserUpdateRequestDTO dto, @MappingTarget UserEntity entity);
 }

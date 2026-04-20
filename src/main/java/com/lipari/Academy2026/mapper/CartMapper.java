@@ -1,7 +1,7 @@
 package com.lipari.Academy2026.mapper;
 
-import com.lipari.Academy2026.dto.CartItemResponseDTO;
-import com.lipari.Academy2026.dto.CartResponseDTO;
+import com.lipari.Academy2026.dto.cart.CartItemResponseDTO;
+import com.lipari.Academy2026.dto.cart.CartResponseDTO;
 import com.lipari.Academy2026.entity.CartEntity;
 import com.lipari.Academy2026.entity.CartItemEntity;
 import org.mapstruct.Mapper;
@@ -17,13 +17,13 @@ import java.math.BigDecimal;
 public interface CartMapper {
 
     /**
-     * Converte un'entità Carrello in un DTO di risposta completo (CartEntity -> CartResponseDTO).
+     * Converte un'entità Carrello in un DTO di risposta completo.
      */
     @Mapping(target = "total", expression = "java(calculateTotal(entity))")
     CartResponseDTO toDto(CartEntity entity);
 
     /**
-     * Converte una riga del carrello in un DTO di dettaglio (CartItemEntity -> CartItemResponseDTO).
+     * Converte una riga del carrello in un DTO di dettaglio.
      */
     @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "productName", source = "product.name")
@@ -32,7 +32,7 @@ public interface CartMapper {
     CartItemResponseDTO toItemDto(CartItemEntity item);
 
     /**
-     * Calcola il costo totale di una riga (quantità * prezzo unitario) (Metodo Default).
+     * Calcola il costo totale di una riga (quantità * prezzo unitario).
      */
     default BigDecimal calculateSubtotal(CartItemEntity item) {
         if (item.getProduct() == null || item.getProduct().getPrice() == null) {
@@ -58,7 +58,7 @@ public interface CartMapper {
 /*
     NOTE DIDATTICHE - [CartMapper]
 
-    Calcolo Dinamico:
+    expression:
        Posso usare 'expression' in @Mapping per invocare i metodi default.
        Cosi posso inserire dei dati nel DTO che non esistono nel DB.
 

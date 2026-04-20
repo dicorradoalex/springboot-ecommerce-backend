@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Rappresenta il carrello della spesa associato a un utente.
+ */
 @Entity
 @Table(name = "carts")
 @Getter
@@ -17,6 +20,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class CartEntity {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,30 +41,31 @@ public class CartEntity {
     @Builder.Default
     private List<CartItemEntity> items = new ArrayList<>();
 
-    // Helper per relazione bidirezionale
+    /**
+     * Metodo helper per gestire correttamente l'aggiunta di un elemento (relazione bidirezionale).
+     */
     public void addItem(CartItemEntity item) {
         items.add(item);
         item.setCart(this);
     }
 
+    /**
+     * Metodo helper per gestire correttamente la rimozione di un elemento.
+     */
     public void removeItem(CartItemEntity item) {
         items.remove(item);
         item.setCart(null);
     }
 }
 
-
 /*
-    NOTE DIDATTICHE - [CartEntity]
+    NOTE DIDATTICHE
 
-     @OneToOne (User):
-       - Un utente ha un solo carrello
-       - unique = true -> vincolo DB
-       - fetch = LAZY -> performance migliore
+    Relazioni OneToOne e OneToMany:
+       - User (OneToOne): Un utente ha un solo carrello (unique = true).
+       - Items (OneToMany): Il carrello gestisce il ciclo di vita dei suoi elementi (CascadeType.ALL, orphanRemoval = true).
 
-     @OneToMany (Items):
-       - Un carrello ha più elementi
-       - mappedBy = "cart" -> relazione gestita da CartItemEntity
-       - orphanRemoval = true -> elimina dal DB gli oggetti rimossi
-
+    Metodi Helper:
+       Per assicurarsi che entrambi i lati del legame siano aggiornati e per fare meno passaggi.
+-----------
 */

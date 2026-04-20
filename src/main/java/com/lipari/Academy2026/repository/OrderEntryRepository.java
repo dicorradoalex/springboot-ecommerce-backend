@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Repository per la gestione della persistenza delle singole righe (dettaglio) degli ordini.
+ */
 @Repository
 public interface OrderEntryRepository extends JpaRepository<OrderEntryEntity, UUID> {
-
-    // Grazie a JpaRepository: save(), findById(), findAll(), deleteById()
-
 
 }

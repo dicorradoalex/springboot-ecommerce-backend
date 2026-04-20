@@ -2,18 +2,22 @@ package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Rappresenta una riga di dettaglio di un ordine, "congelando" prezzo e quantità al momento dell'acquisto.
+ */
 @Entity
 @Table(name = "order_entry")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class OrderEntryEntity {
 
     @Id
@@ -21,13 +25,16 @@ public class OrderEntryEntity {
     @EqualsAndHashCode.Include
     private UUID id;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     @ToString.Exclude
     private ProductEntity product;
 
+
     @Column(nullable = false)
     private Integer quantity;
+
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -42,27 +49,14 @@ public class OrderEntryEntity {
 }
 
 /*
-    NOTE DIDATTICHE
+    NOTE DIDATTICHE - [OrderEntryEntity]
 
-    Annotazioni LOMBOK
-    - @Builder
-      Permette di creare le righe d'ordine al volo durante il checkout.
+    Immutabilità del Prezzo:
+       A differenza del carrello, qui si salva esplicitamente il prezzo. Questo garantisce la validità dello storico
+       ordini anche se il prezzo del prodotto nel catalogo dovesse cambiare in futuro.
 
-    - @ToString.Exclude
-      Evita loop e stackoverflow.
-
-    Annotazioni JPA (Mappatura Database)
-    - @ManyToOne (OWNER SIDE x2)
-      Questa entità è proprietaria di DUE chiavi esterne: 'product_id' e 'order_id'.
-
-    - Fetch Strategy (Best Practice)
-      Usiamo FetchType.LAZY su entrambi i @ManyToOne per evitare di caricare
-      roba inutile
-
-    - Salvare il prezzo
-      Salviamo il 'price' qui anche se esiste già in ProductEntity in
-      modo che anche se il prezzo del prodotto cambierà, l'ordine del
-      cliente deve mantenere il prezzo del momento dell'acquisto.
-
+    Relazioni:
+       L'entità è proprietaria di due chiavi esterne (product_id e order_id), fa da congiunzione tra l'ordine e
+       i prodotti venduti.
 -----------
 */

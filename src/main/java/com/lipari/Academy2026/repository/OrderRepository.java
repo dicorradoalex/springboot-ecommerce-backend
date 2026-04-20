@@ -7,11 +7,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Repository per la gestione della persistenza degli ordini effettuati dagli utenti.
+ */
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, UUID> {
 
-    // Grazie a JpaRepository: save(), findById(), findAll(), deleteById()
-
+    /**
+     * Recupera lo storico degli ordini associati a uno specifico utente.
+     */
     List<OrderEntity> findByUser_Id(UUID userId);
 
 }
