@@ -121,4 +121,26 @@ public class ProductServiceImpl implements ProductService {
         List<ProductEntity> productList = this.productRepository.findAll();
         return this.productMapper.toDtoList(productList);
     }
+
+    /**
+     * Cerca i prodotti nel catalogo filtrandoli per nome.
+     */
+    @Override
+    public List<ProductResponseDTO> searchProductsByName(String name) {
+        // Chiedo al repository di trovare i prodotti che contengono la stringa cercata
+        List<ProductEntity> productList = this.productRepository.findByNameContainingIgnoreCase(name);
+        // Converto la lista di entità in DTO e la restituisco
+        return this.productMapper.toDtoList(productList);
+    }
+
+    /**
+     * Recupera tutti i prodotti che appartengono a una determinata categoria.
+     */
+    @Override
+    public List<ProductResponseDTO> getProductsByCategory(String categoryName) {
+        // Filtro i prodotti in base al nome della categoria associata
+        List<ProductEntity> productList = this.productRepository.findByCategory_Name(categoryName);
+        // Converto i risultati e li restituisco al chiamante
+        return this.productMapper.toDtoList(productList);
+    }
 }

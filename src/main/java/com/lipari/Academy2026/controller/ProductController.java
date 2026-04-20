@@ -41,4 +41,24 @@ public class ProductController {
         List<ProductResponseDTO> products = this.productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+
+    /**
+     * Cerca i prodotti per nome tramite un parametro di ricerca.
+     * Esempio: /api/product/search?name=smartphone
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDTO>> searchProducts(@RequestParam String name) {
+        List<ProductResponseDTO> products = this.productService.searchProductsByName(name);
+        return ResponseEntity.ok(products);
+    }
+
+    /**
+     * Filtra i prodotti in base alla loro categoria.
+     * Esempio: /api/product/category?name=Informatica
+     */
+    @GetMapping("/category")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(@RequestParam(name = "name") String categoryName) {
+        List<ProductResponseDTO> products = this.productService.getProductsByCategory(categoryName);
+        return ResponseEntity.ok(products);
+    }
 }

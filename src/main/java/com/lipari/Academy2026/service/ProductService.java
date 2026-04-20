@@ -17,4 +17,9 @@ public interface ProductService {
     ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO, UUID id);
 
     List<ProductResponseDTO> getAllProducts();
+
+    // Metodi di ricerca
+    List<ProductResponseDTO> searchProductsByName(String name);
+
+    List<ProductResponseDTO> getProductsByCategory(String categoryName);
 }
