@@ -11,6 +11,8 @@ public interface OrderService {
 
     OrderResponseDTO createOrder(OrderRequestDTO orderRequestDto);
 
+    OrderResponseDTO checkout();
+
     OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatus newStatus);
 
     OrderResponseDTO cancelOrder(UUID orderId);

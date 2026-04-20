@@ -25,6 +25,12 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponseDTO> checkout() {
+        OrderResponseDTO order = this.orderService.checkout();
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    }
+
     @GetMapping("/my-orders")
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
         // Chiedo al Service di recuperare gli ordini dell'utente loggato.
