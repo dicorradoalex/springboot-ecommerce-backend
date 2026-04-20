@@ -23,7 +23,7 @@ public class JwtService {
 
     /**
      * Chiave segreta per firmare i token.
-     * In produzione deve essere esterna alla codebase.
+     * In produzione deve essere esterna alla codebase. -> mettila in un file di properties
      */
     private static final String SECRET_KEY =
             "qasMSlWUPbiYqJSvPiHCavb6xFAycSrsHGhl+FzUwX8="; // Generata con power shell

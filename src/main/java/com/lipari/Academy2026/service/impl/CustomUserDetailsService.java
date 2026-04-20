@@ -12,8 +12,7 @@ import java.util.Optional;
 
 /*
     È il componente che sa come recuperare gli utenti nel database quando qualcuno
-    prova a loggarsi.
-    Implementa UserDetailsService.
+    prova a loggarsi. Implementa UserDetailsService.
  */
 
 
