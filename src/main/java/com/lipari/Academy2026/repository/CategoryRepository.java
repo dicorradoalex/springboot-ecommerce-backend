@@ -6,10 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Repository per la gestione della persistenza delle categorie di prodotti.
+ */
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, UUID> {
-
-    // Grazie a JpaRepository: save(), findById(), findAll(), deleteById()
-
 
 }

@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.util.UUID;
 
+/**
+ * Rappresenta un singolo elemento (prodotto e quantità) all'interno di un carrello.
+ */
 @Entity
 @Table(name = "cart_items")
 @Getter
@@ -38,14 +41,7 @@ public class CartItemEntity {
 /*
     NOTE DIDATTICHE - [CartItemEntity]
 
-    Relazioni @ManyToOne:
-       - Più elementi appartengono a un solo carrello (CartEntity)
-       - Più elementi possono riferirsi allo stesso prodotto (ProductEntity)
-
-    Prezzo:
-       - Non viene salvato nel carrello
-       - Si usa sempre il prezzo aggiornato del prodotto
-       - product.getPrice() -> valore dinamico
-
-    (Diverso dagli ordini, dove il prezzo va "congelato")
+    Relazioni ManyToOne:
+       Più righe possono appartenere allo stesso carrello e puntare a prodotti diversi.
+-----------
 */

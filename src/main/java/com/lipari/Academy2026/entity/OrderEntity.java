@@ -2,23 +2,25 @@ package com.lipari.Academy2026.entity;
 
 import com.lipari.Academy2026.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.*;
-import org.hibernate.annotations.Cascade;
 
+/**
+ * Rappresenta un ordine d'acquisto effettuato da un utente.
+ */
 @Entity
 @Table(name = "orders")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class OrderEntity {
 
     @Id
@@ -42,51 +44,29 @@ public class OrderEntity {
     @ToString.Exclude
     private List<OrderEntryEntity> entries;
 
+
     @Column(name = "total", nullable = false)
     private BigDecimal total;
 
-    // Si occupa di instaurare il legame OrderEntity-OrderEntryEntity
-    // Ti evita di gestire due Set (uno per lato)
     public void addEntry(OrderEntryEntity entry) {
         if (entry != null) {
             this.entries.add(entry);
             entry.setOrder(this);
         }
     }
-
-
 }
 
 /*
-    NOTE DIDATTICHE
+    NOTE DIDATTICHE - [OrderEntity]
 
-    Annotazioni LOMBOK
-    - @Table(name = "orders")
-      Si usa il plurale perché "order" è una parola riservata in SQL (ORDER BY).
+    Naming:
+       Usiamo @Table(name = "orders") perché "ORDER" è una parola riservata in SQL.
 
-    - @ToString.Exclude
-      Serve su 'user' e 'entries' per evitare StackOverflow nei log.
+    Enum:
+       @Enumerated(EnumType.STRING) salva lo stato come testo piuttosto che come indici.
 
-    Annotazioni JPA (Mappatura Database)
-    - @ManyToOne (OWNER SIDE verso User)
-      L'ordine "possiede" la chiave esterna 'user_id'. È il lato che proprietario del
-      il legame con l'utente.
-
-    - @OneToMany (INVERSE SIDE verso OrderEntry)
-      L'ordine non ha colonne per le entries nel DB. Il legame è "mappato"
-      dal campo 'order' presente nella classe OrderEntryEntity.
-
-    - Fetch Strategy
-      1. Verso User: @ManyToOne è EAGER di default (si consiglia LAZY).
-      2. Verso Entries: @OneToMany è LAZY di default (ottimo per le performance).
-
-    - LocalDateTime
-      Mappa automaticamente la data e l'ora nel formato corretto del database
-      (TIMESTAMP o DATETIME).
-
-    - @Enumerated(EnumType.STRING)
-      Con questa annotazione JPA salva il valore come una stringa e non come indice (cmportamento
-      di default)
+    Ciclo di vita:
+       Utilizziamo CascadeType.ALL per garantire che al salvataggio dell'ordine vengano salvate automaticamente anche
+       tutte le sue entries.
 -----------
-
 */

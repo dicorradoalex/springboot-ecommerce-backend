@@ -1,20 +1,23 @@
 package com.lipari.Academy2026.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
-import lombok.*;
 
+/**
+ * Rappresenta una categoria per raggruppare i prodotti.
+ */
 @Entity
 @Table(name = "category")
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class CategoryEntity {
 
     @Id
@@ -22,8 +25,10 @@ public class CategoryEntity {
     @EqualsAndHashCode.Include
     private UUID id;
 
+
     @Column(nullable = false, length = 100)
     private String name;
+
 
     @OneToMany(mappedBy = "category")
     @ToString.Exclude
@@ -33,33 +38,10 @@ public class CategoryEntity {
 /*
     NOTE DIDATTICHE
 
-    Annotazioni LOMBOK
+    Relazione OneToMany (Inverse Side):
+       'mappedBy = "category"' indica che il legame è gestito dal campo 'category' in ProductEntity.
 
-    - @Builder
-      Permette la creazione fluida dell'oggetto. Obbligatorio @AllArgsConstructor.
-
-    - @EqualsAndHashCode.Include
-      Limita equals/hashCode solo ai campi scelti.
-      Richiede (onlyExplicitlyIncluded = true) sulla classe.
-
-    - @ToString.Exclude
-      Evita il loop infinito (StackOverflow) con la lista di prodotti associati.
-
-    Annotazioni JPA (Mappatura Database)
-
-    - @OneToMany (INVERSE SIDE)
-      Definisce il lato "riflesso" della relazione. Una categoria ha molti prodotti.
-
-    - mappedBy = "category"
-      Punta al nome della variabile 'category' presente nella classe ProductEntity (Owner Side).
-      Indispensabile per non creare tabelle di giunzione inutili nel database.
-
-    - @Column(nullable = false, length = 100)
-      Garantisce che il nome della categoria sia obbligatorio e non superi i 100 caratteri.
-
+    Lombok:
+       @ToString.Exclude sulla lista prodotti previene loop infiniti.
 -----------
-    SINTESI
-    - Lato Relazione: Inverse Side (non possiede la FK).
-    - Legame: Mappato sul campo 'category' dell'altra entità.
-    - Caricamento: Default LAZY (corretto per le liste).
 */

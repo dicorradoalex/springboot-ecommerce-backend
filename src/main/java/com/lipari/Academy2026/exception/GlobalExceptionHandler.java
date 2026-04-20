@@ -1,6 +1,6 @@
 package com.lipari.Academy2026.exception;
 
-import com.lipari.Academy2026.dto.ErrorResponseDTO;
+import com.lipari.Academy2026.dto.error.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,42 +12,88 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 /**
- *  Questa classe è il Gestore Globale degli Errori. Permette di gestire le eccezioni
- *  di tutti i @RestController in un unico posto. Lo fa "intercettando" le eccezioni
- *  lanciate dai controller (e dai service sottostanti) e trasformandole in un formato
- *  JSON standard (ErrorResponseDTO)
+ * Gestore Globale degli Errori per l'applicazione.
+ * Intercetta le eccezioni lanciate dai Controller e le trasforma in ErrorResponseDTO standardizzati.
  */
-
-// @RestControllerAdvice permette di monitorare tutti i @RestController
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Gestisce il fallimento dell'ordine per mancanza di stock
+    // ECCEZIONI DI BUSINESS (CUSTOM)
+
+    /**
+     * Gestisce il fallimento dell'ordine per mancanza di disponibilità in magazzino.
+     */
     @ExceptionHandler(OutOfStockException.class)
     public ResponseEntity<ErrorResponseDTO> handleOutOfStock(OutOfStockException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.BAD_REQUEST.value(), // Estrai il codice dell'errore (400)
-                ex.getMessage(), // Estrai il messaggio scritto nel Service
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Gestisce il fallimento del login (email o password errate)
+    /**
+     * Gestisce i casi in cui una risorsa richiesta non è presente nel sistema (404).
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Gestisce i conflitti durante la creazione di risorse duplicate (409).
+     */
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExistsException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Gestisce transizioni di stato non valide per gli ordini (400).
+     */
+    @ExceptionHandler(InvalidOrderStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidOrderState(InvalidOrderStateException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+
+    // ECCEZIONI DI FRAMEWORK (SPRING / SECURITY)
+
+    /**
+     * Gestisce il fallimento dell'autenticazione per credenziali errate (401).
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentials(BadCredentialsException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.UNAUTHORIZED.value(), // Estrai il codice dell'errore (401)
+                HttpStatus.UNAUTHORIZED.value(),
                 "Credenziali non valide: email o password errate.",
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    // Gestisce gli errori di validazione (es. @NotBlank, @Size, @Email falliti)
+    /**
+     * Gestisce gli errori di validazione dei DTO (es. @NotBlank, @Positive).
+     * Colleziona tutti i messaggi d'errore in un'unica stringa descrittiva.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        // Recuperiamo solo i messaggi d'errore definiti nel DTO e li uniamo
         String errorMessage = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -61,63 +107,16 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
-    // Intercetta le ResourceNotFoundException
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.NOT_FOUND.value(), // Estrai il codice dell'errore (404)
-                ex.getMessage(), // Estrai il messaggio scritto nel Service
-                LocalDateTime.now() // Cattura l'orario
-        );
-        // Restituisci l'oggetto (che diventerà JSON) e specifica lo stato HTTP 404
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    // Intercetta specificatamente le AlreadyExistsException
-    @ExceptionHandler(AlreadyExistsException.class)
-    public ResponseEntity<ErrorResponseDTO> handleAlreadyExistsException(AlreadyExistsException ex) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.CONFLICT.value(), // Estrai il codice dell'errore (409)
-                ex.getMessage(), // Estrai il messaggio scritto nel Service
-                LocalDateTime.now() // Cattura l'orario
-        );
-        // Restituisci l'oggetto (che diventerà JSON) e specifica lo stato HTTP 409
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
-    }
-
-    // Intercetta specificatamente le AlreadyExistsException
-    @ExceptionHandler(InvalidOrderStateException.class)
-    public ResponseEntity<ErrorResponseDTO> handleInvalidOrderState(InvalidOrderStateException ex) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.BAD_REQUEST.value(), // Estrai il codice dell'errore (400,)
-                ex.getMessage(), // Estrai il messaggio scritto nel Service
-                LocalDateTime.now() // Cattura l'orario
-        );
-        // Restituisci l'oggetto (che diventerà JSON) e specifica lo stato HTTP 400,
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
 }
 
 /*
-    NOTE DIDATTICHE - [GlobalExceptionHandler]
+    NOTE DIDATTICHE
 
-    1. Eccezioni di Business vs Eccezioni di Framework
-       - Eccezioni di Business (Personalizzate): Sono classi create da noi (es. ResourceNotFoundException).
-         Le lanciamo "a mano" nei Service quando una regola del nostro ecommerce fallisce.
-       - Eccezioni di Framework (Native): Sono lanciate automaticamente da Spring (es. MethodArgumentNotValidException).
-         Vengono generate quando i vincoli tecnici (come @Size o @Email nei DTO) non sono rispettati.
+    2. Eccezioni Custom vs Framework:
+       - Custom: Create da noi per logiche di business (es. ResourceNotFoundException).
+       - Framework: Lanciate automaticamente da Spring o Security (es. BadCredentialsException).
 
-    2. Perché non creare una "ValidationException" personalizzata?
-       Spring ha già un'eccezione nativa perfetta per la validazione. Invece di crearne una nuova
-       (che ci costringerebbe a fare un "travaso" di dati inutile), istruiamo il gestore globale
-       a intercettare direttamente quella di sistema. Questo rende il codice più pulito e performante.
-
-    3. Il Ruolo del "Collettore Universale"
-       Il GlobalExceptionHandler agisce come una rete da pesca: cattura sia le nostre eccezioni
-       custom che quelle tecniche di Spring, trasformandole tutte in un formato JSON standard (ErrorResponseDTO).
-       In questo modo, chi usa le nostre API riceve sempre errori con la stessa struttura,
-       indipendentemente da chi ha lanciato l'allarme.
+    3. Standardizzazione (ErrorResponseDTO):
+       Qualsiasi errore viene trasformato in un JSON coerente, facilitando il lavoro del Frontend.
 -----------
 */
-
