@@ -12,17 +12,16 @@ import com.lipari.Academy2026.mapper.OrderMapper;
 import com.lipari.Academy2026.repository.CartRepository;
 import com.lipari.Academy2026.repository.OrderRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
+import com.lipari.Academy2026.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
     private final OrderMapper orderMapper;
+    private final SecurityUtils securityUtils;
 
     /**
      * Crea un nuovo ordine registrando le singole voci e aggiornando lo stock dei prodotti.
@@ -46,8 +46,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDto) {
 
-        // Recupero l'utente loggato dal contesto di sicurezza
-        UserEntity currentUser = getCurrentUser();
+        // Recupero l'utente loggato tramite SecurityUtils
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Inizializzo l'entità Ordine
         OrderEntity newOrder = OrderEntity.builder()
@@ -99,8 +99,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO checkout() {
 
-        // Recupero l'utente attualmente loggato
-        UserEntity currentUser = getCurrentUser();
+        // Recupero l'utente attualmente loggato tramite SecurityUtils
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Recupero il carrello dell'utente
         CartEntity cart = this.cartRepository.findByUser_Id(currentUser.getId())
@@ -154,12 +154,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * Recupera lo storico di tutti gli ordini effettuati dall'utente autenticato.
+     * Recupera lo storico di tutti gli ordini effettuati dall'utente autenticato (Paginato).
      */
     @Override
     public Page<OrderResponseDTO> getMyOrders(Pageable pageable) {
 
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
         Page<OrderEntity> ordersPage = this.orderRepository.findByUser_Id(currentUser.getId(), pageable);
         
         return ordersPage.map(this.orderMapper::toDto);
@@ -173,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDTO cancelOrder(UUID orderId) {
 
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
         
         // Cerco l'ordine e verifico l'esistenza e la proprietà
         OrderEntity order = this.orderRepository.findById(orderId)
@@ -211,13 +211,5 @@ public class OrderServiceImpl implements OrderService {
         this.orderRepository.save(order);
         
         return this.orderMapper.toDto(order);
-    }
-
-    /**
-     * Metodo helper per recuperare l'utente attualmente loggato.
-     */
-    private UserEntity getCurrentUser() {
-        return (UserEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
     }
 }
