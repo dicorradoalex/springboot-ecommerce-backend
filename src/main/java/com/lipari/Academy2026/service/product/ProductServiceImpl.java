@@ -5,15 +5,18 @@ import com.lipari.Academy2026.dto.product.ProductResponseDTO;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.ProductMapper;
-import com.lipari.Academy2026.repository.CategoryRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
 
 /**
  * Implementazione del servizio per la gestione del catalogo prodotti.
@@ -21,11 +24,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Validated
 public class ProductServiceImpl implements ProductService {
 
     // DIPENDENZE
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
 
     /**
@@ -37,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
         // Cerco il prodotto nel database
         Optional<ProductEntity> productOpt = this.productRepository.findById(id);
 
-        if (!productOpt.isPresent())
+        if (productOpt.isEmpty())
             throw new ResourceNotFoundException("Prodotto con ID: " + id + " non trovato");
 
         // Restituisco il DTO mappato
@@ -48,39 +51,54 @@ public class ProductServiceImpl implements ProductService {
      * Restituisce l'elenco completo di tutti i prodotti presenti nel catalogo.
      */
     @Override
-    public List<ProductResponseDTO> getAllProducts() {
+    public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
 
-        // Recupero tutte le entità prodotto
-        List<ProductEntity> productsList = this.productRepository.findAll();
+        // Recupero la pagina di entità prodotto dal db
+        Page<ProductEntity> productsPage = this.productRepository.findAll(pageable);
 
-        // Restituisco la lista mappata in DTO
-        return this.productMapper.toDtoList(productsList);
+        // Uso .map() della Page per convertire ogni entità in DTO
+        return productsPage.map(this.productMapper::toDto);
     }
 
     /**
      * Cerca i prodotti nel catalogo filtrandoli per nome (case-insensitive).
      */
     @Override
-    public List<ProductResponseDTO> searchProductsByName(String name) {
+    public Page<ProductResponseDTO> searchProductsByName(String name, Pageable pageable) {
 
         // Eseguo la ricerca tramite repository
-        List<ProductEntity> productsList = this.productRepository.findByNameContainingIgnoreCase(name);
+        Page<ProductEntity> productsPage = this.productRepository.findByNameContainingIgnoreCase(name, pageable);
 
-        // Restituisco la lista mappata in DTO
-        return this.productMapper.toDtoList(productsList);
+        // Uso .map() della Page per convertire ogni entità in DTO
+        return productsPage.map(this.productMapper::toDto);
     }
 
     /**
      * Recupera l'elenco dei prodotti appartenenti a una specifica categoria.
      */
     @Override
-    public List<ProductResponseDTO> getProductsByCategory(String categoryName) {
+    public Page<ProductResponseDTO> getProductsByCategory(String categoryName, Pageable pageable) {
 
-        // Recupero i prodotti filtrati per nome categoria
-        List<ProductEntity> productsList = this.productRepository.findByCategory_NameIgnoreCase(categoryName);
+        // Recupero i prodotti filtrati per nome categoria dal repository
+        Page<ProductEntity> productsPage = this.productRepository.findByCategory_NameIgnoreCase(categoryName, pageable);
 
-        // Restituisco la lista mappata in DTO
-        return this.productMapper.toDtoList(productsList);
+        // Uso .map() della Page per convertire ogni entità in DTO
+        return productsPage.map(this.productMapper::toDto);
+    }
+
+
+
+    /**
+     * Recupera l'elenco dei prodotti appartenenti a una specifica categoria tramite ID.
+     */
+    @Override
+    public Page<ProductResponseDTO> getProductsByCategoryId(UUID categoryId, Pageable pageable) {
+
+        // Recupero i prodotti filtrati per ID categoria dal repository
+        Page<ProductEntity> productsPage = this.productRepository.findByCategory_Id(categoryId, pageable);
+
+        // Uso .map() della Page per convertire ogni entità in DTO
+        return productsPage.map(this.productMapper::toDto);
     }
 
 
@@ -92,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    public ProductResponseDTO createProduct(ProductRequestDTO requestDTO) {
+    public ProductResponseDTO createProduct(@Valid ProductRequestDTO requestDTO) {
 
         // Converto il DTO in Entità
         ProductEntity product = this.productMapper.toEntity(requestDTO);
@@ -112,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
         // Cerco il prodotto da eliminare
         Optional<ProductEntity> productOpt = this.productRepository.findById(id);
 
-        if (!productOpt.isPresent())
+        if (productOpt.isEmpty())
             throw new ResourceNotFoundException("Prodotto con ID: " + id + " non trovato");
 
         // Rimuovo l'entità dal database
@@ -124,12 +142,12 @@ public class ProductServiceImpl implements ProductService {
      */
     @Transactional
     @Override
-    public ProductResponseDTO updateProduct(ProductRequestDTO requestDTO, UUID id) {
+    public ProductResponseDTO updateProduct(@Valid ProductRequestDTO requestDTO, UUID id) {
 
         // Recupero il prodotto tramite ID
         Optional<ProductEntity> productOpt = this.productRepository.findById(id);
 
-        if (!productOpt.isPresent())
+        if (productOpt.isEmpty())
             throw new ResourceNotFoundException("Prodotto con ID: " + id + " non trovato");
 
         ProductEntity productToUpdate = productOpt.get();

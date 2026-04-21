@@ -6,12 +6,13 @@ import com.lipari.Academy2026.entity.CartEntity;
 import com.lipari.Academy2026.entity.CartItemEntity;
 import com.lipari.Academy2026.entity.ProductEntity;
 import com.lipari.Academy2026.entity.UserEntity;
+import com.lipari.Academy2026.exception.OutOfStockException;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.CartMapper;
 import com.lipari.Academy2026.repository.CartRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
+import com.lipari.Academy2026.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,8 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final CartMapper cartMapper;
+    private final SecurityUtils securityUtils;
+
 
     /**
      * Aggiunge un prodotto al carrello dell'utente o ne aggiorna la quantità se già presente.
@@ -39,7 +42,7 @@ public class CartServiceImpl implements CartService {
     public CartResponseDTO addItemToCart(CartItemRequestDTO request) {
 
         // Recupero l'utente loggato
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Recupero il carrello o lo creo se non esiste
         CartEntity cart = this.cartRepository.findByUser_Id(currentUser.getId())
@@ -64,9 +67,19 @@ public class CartServiceImpl implements CartService {
             }
         }
 
+        // Calcolo la quantità totale che l'utente vorrebbe avere nel carrello
+        int currentQuantityInCart = (existingItem != null) ? existingItem.getQuantity() : 0;
+        int totalRequestedQuantity = currentQuantityInCart + request.quantity();
+
+        // Verifico se la quantità totale richiesta è disponibile
+        if (totalRequestedQuantity > product.getStock()) {
+            throw new OutOfStockException("Quantità richiesta non disponibile. In magazzino: " +
+                    product.getStock() + " | Nel tuo carrello: " + currentQuantityInCart);
+        }
+
         // Se esiste aggiorno la quantità, altrimenti aggiungo un nuovo elemento
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + request.quantity());
+            existingItem.setQuantity(totalRequestedQuantity);
         } else {
             CartItemEntity newItem = CartItemEntity.builder()
                     .cart(cart)
@@ -88,7 +101,7 @@ public class CartServiceImpl implements CartService {
     public CartResponseDTO getCart() {
 
         // Recupero l'utente loggato
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Cerco il carrello nel database
         CartEntity cart = cartRepository.findByUser_Id(currentUser.getId())
@@ -105,7 +118,7 @@ public class CartServiceImpl implements CartService {
     public CartResponseDTO removeItemFromCart(UUID productId) {
 
         // Recupero l'utente loggato
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Cerco il carrello
         CartEntity cart = cartRepository.findByUser_Id(currentUser.getId())
@@ -138,7 +151,7 @@ public class CartServiceImpl implements CartService {
     public void clearCart() {
 
         // Recupero l'utente loggato
-        UserEntity currentUser = getCurrentUser();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Cerco il carrello e svuoto la lista degli item se presente
         var cartOpt = cartRepository.findByUser_Id(currentUser.getId());
@@ -147,14 +160,5 @@ public class CartServiceImpl implements CartService {
             cart.getItems().clear();
             cartRepository.save(cart);
         }
-    }
-
-    /**
-     * Metodo helper per recuperare l'utente attualmente autenticato nel sistema dal contesto di sicurezza.
-     */
-    private UserEntity getCurrentUser() {
-
-        return (UserEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
     }
 }

@@ -3,8 +3,9 @@ package com.lipari.Academy2026.service.order;
 import com.lipari.Academy2026.dto.order.OrderResponseDTO;
 import com.lipari.Academy2026.dto.order.OrderRequestDTO;
 import com.lipari.Academy2026.enums.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -17,5 +18,5 @@ public interface OrderService {
     OrderResponseDTO checkout();
     OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatus newStatus);
     OrderResponseDTO cancelOrder(UUID orderId);
-    List<OrderResponseDTO> getMyOrders();
+    Page<OrderResponseDTO> getMyOrders(Pageable pageable);
 }

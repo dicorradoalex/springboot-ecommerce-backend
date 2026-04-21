@@ -5,11 +5,13 @@ import com.lipari.Academy2026.dto.product.ProductResponseDTO;
 import com.lipari.Academy2026.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.web.PageableDefault;
 import java.util.UUID;
 
 
@@ -39,8 +41,9 @@ public class ProductController {
      * Recupera la lista completa di tutti i prodotti a catalogo.
      */
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
-        List<ProductResponseDTO> products = this.productService.getAllProducts();
+    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
+            @PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
+        Page<ProductResponseDTO> products = this.productService.getAllProducts(pageable);
         return ResponseEntity.ok(products);
     }
 
@@ -48,22 +51,23 @@ public class ProductController {
      * Cerca i prodotti per nome tramite un parametro di ricerca.
      */
     @GetMapping("/search")
-    public ResponseEntity<List<ProductResponseDTO>> searchProducts(
-            @RequestParam String name) {
+    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(
+            @RequestParam String name,
+            @PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
 
-        List<ProductResponseDTO> products = this.productService.searchProductsByName(name);
+        Page<ProductResponseDTO> products = this.productService.searchProductsByName(name, pageable);
         return ResponseEntity.ok(products);
     }
 
     /**
-     * Filtra i prodotti in base alla loro categoria (Legacy).
-     * Nota: È preferibile usare l'endpoint nidificato in CategoryController.
+     * Filtra i prodotti in base alla loro categoria.
      */
     @GetMapping("/category")
-    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategory(
-            @RequestParam(name = "name") String categoryName) {
+    public ResponseEntity<Page<ProductResponseDTO>> getProductsByCategory(
+            @RequestParam(name = "name") String categoryName,
+            @PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
 
-        List<ProductResponseDTO> products = this.productService.getProductsByCategory(categoryName);
+        Page<ProductResponseDTO> products = this.productService.getProductsByCategory(categoryName, pageable);
         return ResponseEntity.ok(products);
     }
 

@@ -2,6 +2,8 @@ package com.lipari.Academy2026.service.product;
 
 import com.lipari.Academy2026.dto.product.ProductRequestDTO;
 import com.lipari.Academy2026.dto.product.ProductResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,8 @@ public interface ProductService {
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
     void deleteProduct(UUID id);
     ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO, UUID id);
-    List<ProductResponseDTO> getAllProducts();
-    List<ProductResponseDTO> searchProductsByName(String name);
-    List<ProductResponseDTO> getProductsByCategory(String categoryName);
+    Page<ProductResponseDTO> getAllProducts(Pageable pageable);
+    Page<ProductResponseDTO> searchProductsByName(String name, Pageable pageable);
+    Page<ProductResponseDTO> getProductsByCategory(String categoryName, Pageable pageable);
+    Page<ProductResponseDTO> getProductsByCategoryId(UUID categoryId, Pageable pageable);
 }

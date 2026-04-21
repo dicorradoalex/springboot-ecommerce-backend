@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+
 /**
  * Gestisce la creazione e la visualizzazione degli ordini.
  */
@@ -46,11 +50,10 @@ public class OrderController {
      * Recupera la lista degli ordini dell'utente loggato.
      */
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> getMyOrders() {
-        // Chiedo al Service di recuperare gli ordini dell'utente loggato.
-        List<OrderResponseDTO> myOrders = this.orderService.getMyOrders();
-
-        // Restituisco la lista con stato 200 OK
+    public ResponseEntity<Page<OrderResponseDTO>> getMyOrders(
+            @PageableDefault(page = 0, size = 5, sort = "orderTime") Pageable pageable) {
+        
+        Page<OrderResponseDTO> myOrders = this.orderService.getMyOrders(pageable);
         return ResponseEntity.ok(myOrders);
     }
 

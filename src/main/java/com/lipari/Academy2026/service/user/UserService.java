@@ -2,8 +2,9 @@ package com.lipari.Academy2026.service.user;
 
 import com.lipari.Academy2026.dto.user.UserResponseDTO;
 import com.lipari.Academy2026.dto.user.UserUpdateRequestDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -15,5 +16,5 @@ public interface UserService {
     UserResponseDTO updateUser(UserUpdateRequestDTO updateDTO);
     UserResponseDTO getUser(UUID id);
     void deleteUser(UUID id);
-    List<UserResponseDTO> getAllUsers();
+    Page<UserResponseDTO> getAllUsers(Pageable pageable);
 }

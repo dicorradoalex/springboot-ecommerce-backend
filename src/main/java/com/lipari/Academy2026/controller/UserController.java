@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+
 /**
  * Gestisce la visualizzazione e la modifica del profilo utente.
  */
@@ -48,12 +52,13 @@ public class UserController {
     // AREA ADMIN
 
     /**
-     * Recupera la lista di tutti gli utenti registrati (Admin).
+     * Recupera la lista di tutti gli utenti registrati.
      */
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> usersList = this.userService.getAllUsers();
-        return ResponseEntity.ok(usersList);
+    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
+            @PageableDefault(page = 0, size = 10, sort = "surname") Pageable pageable) {
+        Page<UserResponseDTO> usersPage = this.userService.getAllUsers(pageable);
+        return ResponseEntity.ok(usersPage);
     }
 
     /**

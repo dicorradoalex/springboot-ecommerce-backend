@@ -6,12 +6,13 @@ import com.lipari.Academy2026.entity.UserEntity;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.UserMapper;
 import com.lipari.Academy2026.repository.UserRepository;
+import com.lipari.Academy2026.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
     // DIPENDENZE
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final SecurityUtils securityUtils;
 
     /**
      * Recupera le informazioni del profilo dell'utente attualmente autenticato.
@@ -32,8 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO getCurrentUser() {
 
-        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         return this.userMapper.toDto(currentUser);
     }
@@ -45,8 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDTO updateUser(UserUpdateRequestDTO updateDTO) {
 
-        UserEntity currentUser = (UserEntity) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
+        UserEntity currentUser = securityUtils.getCurrentUser();
 
         // Recupero l'utente dal database
         UserEntity userToUpdate = this.userRepository.findById(currentUser.getId())
@@ -93,9 +93,9 @@ public class UserServiceImpl implements UserService {
      * Restituisce l'elenco completo di tutti gli utenti registrati nella piattaforma.
      */
     @Override
-    public List<UserResponseDTO> getAllUsers() {
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
 
-        List<UserEntity> usersList = this.userRepository.findAll();
-        return this.userMapper.toDtoList(usersList);
+        Page<UserEntity> usersPage = this.userRepository.findAll(pageable);
+        return usersPage.map(this.userMapper::toDto);
     }
 }

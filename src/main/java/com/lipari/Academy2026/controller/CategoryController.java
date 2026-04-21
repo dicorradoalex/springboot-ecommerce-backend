@@ -2,6 +2,7 @@ package com.lipari.Academy2026.controller;
 
 import com.lipari.Academy2026.dto.category.CategoryRequestDTO;
 import com.lipari.Academy2026.dto.category.CategoryResponseDTO;
+import com.lipari.Academy2026.dto.product.ProductResponseDTO;
 import com.lipari.Academy2026.service.category.CategoryService;
 import com.lipari.Academy2026.service.product.ProductService;
 import jakarta.validation.Valid;
@@ -10,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,11 +51,14 @@ public class CategoryController {
      * Esempio: /api/category/{id}/products
      */
     @GetMapping("/{id}/products")
-    public ResponseEntity<List<com.lipari.Academy2026.dto.product.ProductResponseDTO>> getProductsByCategory(@PathVariable UUID id) {
-        // Recupero il nome della categoria tramite l'ID
-        CategoryResponseDTO category = this.categoryService.getCategory(id);
-        // Uso il ProductService per cercare i prodotti tramite il nome della categoria
-        List<com.lipari.Academy2026.dto.product.ProductResponseDTO> products = this.productService.getProductsByCategory(category.name());
+    public ResponseEntity<Page<ProductResponseDTO>> getProductsByCategory(
+            @PathVariable UUID id,
+            @PageableDefault(page = 0, size = 10, sort = "name") Pageable pageable) {
+        
+        // Uso direttamente il ProductService passando l'ID della categoria e il pageable
+        Page<ProductResponseDTO> products =
+                this.productService.getProductsByCategoryId(id, pageable);
+                
         return ResponseEntity.ok(products);
     }
 
