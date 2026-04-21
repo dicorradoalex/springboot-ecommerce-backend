@@ -46,7 +46,7 @@ public class ProductEntity {
 }
 
 /*
-    NOTE DIDATTICHE - [ProductEntity]
+    NOTE DIDATTICHE
 
     Relazione ManyToOne:
        - Owner Side: Questa entità possiede la chiave esterna (category_id).
