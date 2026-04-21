@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +24,14 @@ public class JwtService {
 
     /**
      * Chiave segreta per firmare i token.
-     * In produzione deve essere esterna alla codebase. -> mettila in un file di properties
+     * In produzione deve essere esterna alla codebase (in file di properties).
      */
-    private static final String SECRET_KEY =
-            "qasMSlWUPbiYqJSvPiHCavb6xFAycSrsHGhl+FzUwX8="; // Generata con power shell
+    @Value("${jwt.secret.key}")
+    private String secretKey; // Generata con power shell
+
+    @Value("${jwt.expiration.ms}")
+    private long jwtExpiration;
+
 
     /**
      * Estrae lo username (email) dal token.
@@ -50,7 +55,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -85,14 +90,14 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
 
 
 /*
-    NOTE DIDATTICHE - [JwtService]
+    NOTE DIDATTICHE
 
     - Claims:
       Sono le informazioni contenute nel token (subject, expiration,
@@ -109,6 +114,5 @@ public class JwtService {
       gestita come stringa.
 
     - Scadenza:
-      1000L * 60 * 60 * 24 = 24 ore.
       In sistemi reali si usano durate molto più brevi (15–60 min).
 */

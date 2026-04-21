@@ -3,6 +3,8 @@ package com.lipari.Academy2026.entity;
 import com.lipari.Academy2026.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id=?")
+@SQLRestriction("deleted = false")
 public class UserEntity implements UserDetails {
 
     @Id
@@ -67,6 +71,10 @@ public class UserEntity implements UserDetails {
     @ToString.Exclude
     private CartEntity cart;
 
+    // Per soft delete
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     // METODI SPRING SECURITY (UserDetails)
 
     @Override
@@ -96,7 +104,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !this.deleted;
     }
 }
 

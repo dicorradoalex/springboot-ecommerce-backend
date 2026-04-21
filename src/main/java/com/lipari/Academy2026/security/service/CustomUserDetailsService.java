@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Recupera l'utente nel database
         Optional<UserEntity> userOptional = this.userRepository.findByEmail(email);
-        if (!userOptional.isPresent())
+        if (userOptional.isEmpty())
             throw new UsernameNotFoundException("Utente non trovato con email: " + email);
 
         // Restituiamo l'entità (UserEntity implementa UserDetails)
