@@ -182,9 +182,19 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUser().getId().equals(currentUser.getId()))
             throw new ResourceNotFoundException("Ordine con ID: " + orderId + " non trovato per questo utente.");
 
-        // Verifico lo stato attuale
+        // Verifico lo stato attuale: non deve essere già annullato
+        if (order.getStatus() == OrderStatus.CANCELED)
+            throw new InvalidOrderStateException("L'ordine è già stato annullato.");
+
         if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED)
             throw new InvalidOrderStateException("Impossibile annullare l'ordine: è già stato spedito o consegnato.");
+
+        // Ripristino stock: per ogni voce dell'ordine, restituisci la quantità al magazzino
+        for (OrderEntryEntity entry : order.getEntries()) {
+            ProductEntity product = entry.getProduct();
+            product.setStock(product.getStock() + entry.getQuantity());
+            this.productRepository.save(product);
+        }
 
         // Aggiorno lo stato in CANCELED
         order.setStatus(OrderStatus.CANCELED);
