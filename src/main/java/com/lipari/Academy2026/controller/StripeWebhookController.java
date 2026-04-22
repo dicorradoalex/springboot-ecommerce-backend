@@ -2,9 +2,8 @@ package com.lipari.Academy2026.controller;
 
 import com.lipari.Academy2026.service.order.OrderService;
 import com.stripe.exception.SignatureVerificationException;
-import com.stripe.exception.EventDataObjectDeserializationException; // <-- NUOVO IMPORT AGGIUNTO
+import com.stripe.exception.EventDataObjectDeserializationException;
 import com.stripe.model.Event;
-import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import lombok.RequiredArgsConstructor;
