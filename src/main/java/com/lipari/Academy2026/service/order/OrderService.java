@@ -19,4 +19,16 @@ public interface OrderService {
     OrderResponseDTO updateOrderStatus(UUID orderId, OrderStatus newStatus);
     OrderResponseDTO cancelOrder(UUID orderId);
     Page<OrderResponseDTO> getMyOrders(Pageable pageable);
+
+    /**
+     * Gestisce la conferma del pagamento da parte di Stripe.
+     * @param sessionId ID della sessione di checkout di Stripe.
+     */
+    void handlePaymentSuccess(String sessionId);
+
+    /**
+     * Gestisce il fallimento del pagamento da parte di Stripe.
+     * @param sessionId ID della sessione di checkout di Stripe.
+     */
+    void handlePaymentFailure(String sessionId);
 }

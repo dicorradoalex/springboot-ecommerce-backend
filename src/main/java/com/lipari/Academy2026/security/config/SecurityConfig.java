@@ -77,6 +77,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Auth: Accesso libero per registrazione e login
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/webhook/stripe").permitAll()
+                        .requestMatchers("/api/order/success").permitAll()
+                        .requestMatchers("/api/order/cancel").permitAll()
                         .requestMatchers("/error").permitAll()
 
                         // Prodotti: Lettura pubblica, Scrittura per ADMIN

@@ -12,7 +12,10 @@ import com.lipari.Academy2026.mapper.OrderMapper;
 import com.lipari.Academy2026.repository.CartRepository;
 import com.lipari.Academy2026.repository.OrderRepository;
 import com.lipari.Academy2026.repository.ProductRepository;
+import com.lipari.Academy2026.service.stripe.StripeService;
 import com.lipari.Academy2026.util.SecurityUtils;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final OrderMapper orderMapper;
     private final SecurityUtils securityUtils;
+    private final StripeService stripeService;
 
     /**
      * Crea un nuovo ordine registrando le singole voci e aggiornando lo stock dei prodotti.
@@ -52,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
         // Inizializzo l'entità Ordine
         OrderEntity newOrder = OrderEntity.builder()
                 .user(currentUser)
-                .status(OrderStatus.CREATED)
+                .status(OrderStatus.PENDING_PAYMENT)
                 .orderTime(LocalDateTime.now())
                 .total(BigDecimal.ZERO)
                 .entries(new ArrayList<>())
@@ -87,9 +91,24 @@ public class OrderServiceImpl implements OrderService {
             newOrder.addEntry(newOrderEntry);
         }
 
-        // Salvo l'ordine e restituisco il DTO
-        this.orderRepository.save(newOrder);
-        return this.orderMapper.toDto(newOrder);
+        // Salvo l'ordine inizialmente
+        OrderEntity savedOrder = this.orderRepository.save(newOrder);
+
+        // Genero la sessione Stripe
+        try {
+            Session session = stripeService.createCheckoutSession(savedOrder);
+            savedOrder.setStripeSessionId(session.getId());
+            this.orderRepository.save(savedOrder);
+
+            OrderResponseDTO dto = this.orderMapper.toDto(savedOrder);
+            // Poiché OrderResponseDTO è un record, dobbiamo ricostruirlo per aggiungere l'URL
+            return new OrderResponseDTO(
+                    dto.id(), dto.user(), dto.status(), dto.orderTime(),
+                    dto.entries(), dto.total(), session.getId(), session.getUrl()
+            );
+        } catch (StripeException e) {
+            throw new RuntimeException("Errore durante la creazione della sessione di pagamento Stripe", e);
+        }
     }
 
     /**
@@ -114,7 +133,7 @@ public class OrderServiceImpl implements OrderService {
         // Inizializzo l'entità dell'ordine
         OrderEntity newOrder = OrderEntity.builder()
                 .user(currentUser)
-                .status(OrderStatus.CREATED)
+                .status(OrderStatus.PENDING_PAYMENT)
                 .orderTime(LocalDateTime.now())
                 .total(BigDecimal.ZERO)
                 .entries(new ArrayList<>())
@@ -150,7 +169,20 @@ public class OrderServiceImpl implements OrderService {
         cart.getItems().clear();
         this.cartRepository.save(cart);
 
-        return this.orderMapper.toDto(savedOrder);
+        // Genero la sessione Stripe
+        try {
+            Session session = stripeService.createCheckoutSession(savedOrder);
+            savedOrder.setStripeSessionId(session.getId());
+            this.orderRepository.save(savedOrder);
+
+            OrderResponseDTO dto = this.orderMapper.toDto(savedOrder);
+            return new OrderResponseDTO(
+                    dto.id(), dto.user(), dto.status(), dto.orderTime(),
+                    dto.entries(), dto.total(), session.getId(), session.getUrl()
+            );
+        } catch (StripeException e) {
+            throw new RuntimeException("Errore durante la creazione della sessione di pagamento Stripe", e);
+        }
     }
 
     /**
@@ -221,5 +253,37 @@ public class OrderServiceImpl implements OrderService {
         this.orderRepository.save(order);
         
         return this.orderMapper.toDto(order);
+    }
+
+    @Override
+    @Transactional
+    public void handlePaymentSuccess(String sessionId) {
+        OrderEntity order = this.orderRepository.findByStripeSessionId(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ordine con Stripe Session ID: " + sessionId + " non trovato"));
+
+        if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
+            order.setStatus(OrderStatus.PAID);
+            this.orderRepository.save(order);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void handlePaymentFailure(String sessionId) {
+        OrderEntity order = this.orderRepository.findByStripeSessionId(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ordine con Stripe Session ID: " + sessionId + " non trovato"));
+
+        if (order.getStatus() == OrderStatus.PENDING_PAYMENT) {
+            order.setStatus(OrderStatus.PAYMENT_FAILED);
+            
+            // Ripristino stock
+            for (OrderEntryEntity entry : order.getEntries()) {
+                ProductEntity product = entry.getProduct();
+                product.setStock(product.getStock() + entry.getQuantity());
+                this.productRepository.save(product);
+            }
+            
+            this.orderRepository.save(order);
+        }
     }
 }

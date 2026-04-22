@@ -16,5 +16,7 @@ public record OrderResponseDTO(
         OrderStatus status,
         LocalDateTime orderTime,
         List<OrderEntryResponseDTO> entries,
-        BigDecimal total
+        BigDecimal total,
+        String stripeSessionId,
+        String paymentUrl
 ) {}
