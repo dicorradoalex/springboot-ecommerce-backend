@@ -44,3 +44,17 @@ databaseChangeLog:
                   type: DECIMAL(10, 2)
                   constraints:
                     nullable: false
+
+  - changeSet:
+      id: 20260422105618
+      author: dicorradoalex
+      changes:
+        - addColumn:
+            tableName: orders
+            columns:
+              - column:
+                  name: stripe_session_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+

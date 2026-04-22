@@ -48,6 +48,12 @@ public class OrderEntity {
     @Column(name = "total", nullable = false)
     private BigDecimal total;
 
+    /**
+     * ID della sessione di checkout di Stripe per riconciliare il pagamento via Webhook.
+     */
+    @Column(name = "stripe_session_id")
+    private String stripeSessionId;
+
     public void addEntry(OrderEntryEntity entry) {
         if (entry != null) {
             this.entries.add(entry);

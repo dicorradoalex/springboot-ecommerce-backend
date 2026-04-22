@@ -47,6 +47,22 @@ public class OrderController {
     }
 
     /**
+     * Endpoint di atterraggio dopo un pagamento completato con successo su Stripe.
+     */
+    @GetMapping("/success")
+    public ResponseEntity<String> paymentSuccess(@RequestParam("session_id") String sessionId) {
+        return ResponseEntity.ok("Pagamento ricevuto con successo! Il tuo ordine è in fase di elaborazione. Session ID: " + sessionId);
+    }
+
+    /**
+     * Endpoint di atterraggio dopo che un utente ha annullato il pagamento su Stripe.
+     */
+    @GetMapping("/cancel")
+    public ResponseEntity<String> paymentCancel() {
+        return ResponseEntity.ok("Il pagamento è stato annullato. Puoi riprovare dal tuo carrello.");
+    }
+
+    /**
      * Recupera la lista degli ordini dell'utente loggato.
      */
     @GetMapping
