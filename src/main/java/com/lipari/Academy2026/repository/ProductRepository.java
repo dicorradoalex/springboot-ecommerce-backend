@@ -30,4 +30,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
      */
     Page<ProductEntity> findByCategory_NameIgnoreCase(String categoryName, Pageable pageable);
 
+
+    /**
+     * Verifica se esistono prodotti associati a una specifica categoria.
+     */
+    boolean existsByCategory_Id(UUID categoryId);
+
 }

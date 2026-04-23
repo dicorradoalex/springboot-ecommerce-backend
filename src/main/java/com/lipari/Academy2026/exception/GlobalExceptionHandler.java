@@ -47,6 +47,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gestisce il tentativo di eliminazione di una categoria che non è vuota.
+     */
+    @ExceptionHandler(CategoryNotEmptyException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCategoryNotEmpty(CategoryNotEmptyException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Gestisce i conflitti durante la creazione di risorse duplicate (409).
      */
     @ExceptionHandler(AlreadyExistsException.class)

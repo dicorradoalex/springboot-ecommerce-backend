@@ -3,9 +3,11 @@ package com.lipari.Academy2026.service.category;
 import com.lipari.Academy2026.dto.category.CategoryRequestDTO;
 import com.lipari.Academy2026.dto.category.CategoryResponseDTO;
 import com.lipari.Academy2026.entity.CategoryEntity;
+import com.lipari.Academy2026.exception.CategoryNotEmptyException;
 import com.lipari.Academy2026.exception.ResourceNotFoundException;
 import com.lipari.Academy2026.mapper.CategoryMapper;
 import com.lipari.Academy2026.repository.CategoryRepository;
+import com.lipari.Academy2026.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     // DIPENDENZE
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
     private final CategoryMapper categoryMapper;
 
     /**
@@ -35,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Cerco la categoria tramite ID
         Optional<CategoryEntity> categoryOpt = this.categoryRepository.findById(id);
         
-        if (!categoryOpt.isPresent())
+        if (categoryOpt.isEmpty())
             throw new ResourceNotFoundException("Categoria con ID: " + id + " non trovata");
 
         // Restituisco il DTO mappato
@@ -81,14 +84,18 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(UUID id) {
 
-        // Cerco l'entità da eliminare
-        Optional<CategoryEntity> categoryOpt = this.categoryRepository.findById(id);
-        
-        if (!categoryOpt.isPresent())
+        // Cerco l'entità per assicurarmi che esista
+        if (!this.categoryRepository.existsById(id))
             throw new ResourceNotFoundException("Categoria con ID: " + id + " non trovata");
-        
+
+        // Verifico se ci sono prodotti associati a questa categoria
+        boolean hasProducts = this.productRepository.existsByCategory_Id(id);
+
+        if (hasProducts)
+            throw new CategoryNotEmptyException("Impossibile eliminare la categoria: sono presenti prodotti associati.");
+
         // Rimuovo definitivamente la categoria
-        this.categoryRepository.delete(categoryOpt.get());
+        this.categoryRepository.deleteById(id);
     }
 
     /**
@@ -101,7 +108,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Recupero la categoria tramite ID
         Optional<CategoryEntity> categoryOpt = this.categoryRepository.findById(id);
         
-        if (!categoryOpt.isPresent())
+        if (categoryOpt.isEmpty())
             throw new ResourceNotFoundException("Categoria con ID: " + id + " non trovata");
 
         CategoryEntity categoryToUpdate = categoryOpt.get();
