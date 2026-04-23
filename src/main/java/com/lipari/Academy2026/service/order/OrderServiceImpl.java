@@ -53,6 +53,9 @@ public class OrderServiceImpl implements OrderService {
         // Recupero l'utente loggato tramite SecurityUtils
         UserEntity currentUser = securityUtils.getCurrentUser();
 
+        // Validazione dati di spedizione
+        validateUserAddress(currentUser);
+
         // Inizializzo l'entità Ordine
         OrderEntity newOrder = OrderEntity.builder()
                 .user(currentUser)
@@ -120,6 +123,9 @@ public class OrderServiceImpl implements OrderService {
 
         // Recupero l'utente attualmente loggato tramite SecurityUtils
         UserEntity currentUser = securityUtils.getCurrentUser();
+
+        // Validazione dati di spedizione
+        validateUserAddress(currentUser);
 
         // Recupero il carrello dell'utente
         CartEntity cart = this.cartRepository.findByUser_Id(currentUser.getId())
@@ -284,6 +290,17 @@ public class OrderServiceImpl implements OrderService {
             }
             
             this.orderRepository.save(order);
+        }
+    }
+
+    /**
+     * Verifica che l'utente abbia inserito i dati minimi di spedizione nel profilo.
+     */
+    private void validateUserAddress(UserEntity user) {
+        if (user.getAddress() == null || user.getAddress().isBlank() ||
+            user.getCity() == null || user.getCity().isBlank() ||
+            user.getCountry() == null || user.getCountry().isBlank()) {
+            throw new InvalidOrderStateException("Profilo incompleto: inserisci indirizzo, città e nazione nel tuo profilo per procedere con l'ordine.");
         }
     }
 }
