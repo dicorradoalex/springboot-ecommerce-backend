@@ -96,6 +96,7 @@ public class SecurityConfig {
 
                         // Ordini: Visualizzazione lista e gestione stato riservata agli ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/order/admin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/order/*/retry-payment").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/api/order/*/status").hasRole("ADMIN")
 
                         // Utenti: Gestione lista e cancellazione riservata agli ADMIN

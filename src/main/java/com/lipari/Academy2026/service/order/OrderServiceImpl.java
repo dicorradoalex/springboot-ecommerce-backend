@@ -304,6 +304,35 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public String getPaymentUrl(UUID orderId) {
+        // Trova l'ordine nel database
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Ordine non trovato"));
+
+        // Controlla che sia effettivamente in attesa di pagamento
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+            throw new RuntimeException("Questo ordine non è in attesa di pagamento.");
+        }
+
+        try {
+            // Interroga Stripe per recuperare la sessione originale
+            Session session = Session.retrieve(order.getStripeSessionId());
+
+            // Verifica che la sessione sia ancora valida (dura 24 ore)
+            if ("open".equals(session.getStatus())) {
+                return session.getUrl(); // Ritorna il link per pagare
+            } else {
+                // Se sono passate 24 ore, la sessione è "expired".
+                // In un sistema avanzato qui creeresti una NUOVA sessione aggiornando il DB.
+                throw new RuntimeException("La sessione di pagamento è scaduta. Annulla l'ordine e rifallo.");
+            }
+
+        } catch (StripeException e) {
+            throw new RuntimeException("Errore di comunicazione con Stripe: " + e.getMessage());
+        }
+    }
+
     /**
      * Verifica che l'utente abbia inserito i dati minimi di spedizione nel profilo.
      */

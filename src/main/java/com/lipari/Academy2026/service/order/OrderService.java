@@ -22,6 +22,11 @@ public interface OrderService {
     Page<OrderResponseDTO> getAllOrders(Pageable pageable);
 
     /**
+     * Recupera l'URL di pagamento di Stripe per un ordine esistente.
+     */
+    String getPaymentUrl(UUID orderId);
+
+    /**
      * Gestisce la conferma del pagamento da parte di Stripe.
      * @param sessionId ID della sessione di checkout di Stripe.
      */

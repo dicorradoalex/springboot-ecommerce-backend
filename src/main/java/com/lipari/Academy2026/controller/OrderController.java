@@ -4,18 +4,20 @@ import com.lipari.Academy2026.dto.order.OrderRequestDTO;
 import com.lipari.Academy2026.dto.order.OrderResponseDTO;
 import com.lipari.Academy2026.enums.OrderStatus;
 import com.lipari.Academy2026.service.order.OrderService;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 
 /**
  * Gestisce la creazione e la visualizzazione degli ordini.
@@ -51,7 +53,24 @@ public class OrderController {
      */
     @GetMapping("/success")
     public ResponseEntity<String> paymentSuccess(@RequestParam("session_id") String sessionId) {
-        return ResponseEntity.ok("Pagamento ricevuto con successo! Il tuo ordine è in fase di elaborazione. Session ID: " + sessionId);
+        try {
+            // 1. Chiediamo a Stripe il vero stato di questa sessione
+            Session session = Session.retrieve(sessionId);
+
+            // 2. Controlliamo se i soldi sono stati effettivamente prelevati
+            if ("paid".equals(session.getPaymentStatus())) {
+                return ResponseEntity.ok("Pagamento confermato! Il tuo ordine è in lavorazione. Session ID: " + sessionId);
+            } else {
+                // L'utente è arrivato qui per sbaglio (es. tasto indietro del browser) ma non ha pagato
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Attenzione: il pagamento non risulta completato. Controlla il tuo carrello e riprova.");
+                // In un'app reale qui faresti un redirect (es. return "redirect:/cart")
+            }
+
+        } catch (StripeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Errore durante la verifica del pagamento con Stripe.");
+        }
     }
 
     /**
@@ -60,6 +79,28 @@ public class OrderController {
     @GetMapping("/cancel")
     public ResponseEntity<String> paymentCancel() {
         return ResponseEntity.ok("Il pagamento è stato annullato. Puoi riprovare dal tuo carrello.");
+    }
+
+    /**
+     * Permette di riprendere un pagamento in sospeso.
+     */
+    @GetMapping("/{id}/retry-payment")
+    public ResponseEntity<Map<String, String>> retryPayment(@PathVariable UUID id) {
+        try {
+            // Recupera l'URL dal service
+            String paymentUrl = this.orderService.getPaymentUrl(id);
+
+            // Lo restituiamo in formato JSON per il frontend
+            Map<String, String> response = new HashMap<>();
+            response.put("paymentUrl", paymentUrl);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
 
     /**
