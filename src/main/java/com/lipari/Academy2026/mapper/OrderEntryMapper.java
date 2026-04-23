@@ -7,18 +7,22 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = {ProductMapper.class})
+@Mapper(componentModel = "spring")
 public interface OrderEntryMapper {
 
     /**
-     * Converte un'entità riga d'ordine nel relativo DTO di risposta per il client.
+     * Converte un'entità riga d'ordine nel relativo DTO di risposta.
+     * Mappa l'ID del prodotto navigando nell'entità e il nome dal campo storicizzato.
      */
+    @Mapping(target = "productId", source = "product.id")
+    @Mapping(target = "productName", source = "productName")
     OrderEntryResponseDTO toDto(OrderEntryEntity entity);
 
     /**
      * Converte il DTO di risposta in un'entità riga d'ordine.
      */
     @Mapping(target = "order", ignore = true)
+    @Mapping(target = "product", ignore = true)
     OrderEntryEntity toEntity(OrderEntryResponseDTO dto);
 
     /**

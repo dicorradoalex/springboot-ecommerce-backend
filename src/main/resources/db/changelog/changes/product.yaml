@@ -31,7 +31,7 @@ databaseChangeLog:
                   name: description
                   type: TEXT
 
-# Ahhiunto campo stock per la disponibilità di un articolo
+# Aggiunto campo stock per la disponibilità di un articolo
   - changeSet:
       id: 20260418174743
       author: dicorradoalex
@@ -43,5 +43,20 @@ databaseChangeLog:
                   name: stock
                   type: INT
                   defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+# Aggiunto campo per soft delete
+  - changeSet:
+      id: 20260423101206
+      author: dicorradoalex
+      changes:
+        - addColumn:
+            tableName: product
+            columns:
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
                   constraints:
                     nullable: false

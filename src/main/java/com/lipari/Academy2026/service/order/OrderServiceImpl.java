@@ -81,9 +81,10 @@ public class OrderServiceImpl implements OrderService {
             product.setStock(product.getStock() - entryDto.quantity());
             this.productRepository.save(product);
 
-            // Creo la riga di dettaglio dell'ordine (congelando il prezzo attuale)
+            // Creo la riga di dettaglio dell'ordine (congelando prezzo e nome attuale)
             OrderEntryEntity newOrderEntry = OrderEntryEntity.builder()
                     .product(product)
+                    .productName(product.getName())
                     .quantity(entryDto.quantity())
                     .price(product.getPrice())
                     .total(product.getPrice().multiply(BigDecimal.valueOf(entryDto.quantity())))
@@ -160,6 +161,7 @@ public class OrderServiceImpl implements OrderService {
             // Creo riga d'ordine (OrderEntry)
             OrderEntryEntity orderEntry = OrderEntryEntity.builder()
                     .product(product)
+                    .productName(product.getName())
                     .quantity(cartItem.getQuantity())
                     .price(product.getPrice())
                     .total(product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))

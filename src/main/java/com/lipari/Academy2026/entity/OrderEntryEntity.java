@@ -31,6 +31,14 @@ public class OrderEntryEntity {
     @ToString.Exclude
     private ProductEntity product;
 
+    /**
+     * Nome del prodotto al momento dell'acquisto.
+     * Serve per garantire che lo storico ordini rimanga consultabile
+     * anche se il prodotto originale viene rinominato o rimosso (soft-delete).
+     */
+    @Column(name = "product_name", nullable = true)
+    private String productName;
+
 
     @Column(nullable = false)
     private Integer quantity;

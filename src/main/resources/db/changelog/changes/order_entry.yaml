@@ -52,3 +52,16 @@ databaseChangeLog:
                   type: DECIMAL(10, 2)
                   constraints:
                     nullable: false
+
+  - changeSet:
+      id: 20260423102543
+      author: dicorradoalex
+      changes:
+        - addColumn:
+            tableName: order_entry
+            columns:
+              - column:
+                  name: product_name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
